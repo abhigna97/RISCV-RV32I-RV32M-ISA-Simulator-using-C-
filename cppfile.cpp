@@ -191,8 +191,8 @@ int main(int argc, char** argv)
 		cout << argv[i] << "\n";
     
     StackSize = int(argv[1]); // argv[0] is the program name
-	//execute a loop if file opened successfully
-	while(myfile){
+    PCValue = int(argv[2]);
+	
 		myfile>>PCValue>>Instruction;
 		InstructionDecode(Instruction,PCValue);
 	}
