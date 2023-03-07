@@ -10,8 +10,8 @@
 
 using namespace std;
 
-map<int, int> Memory;       			// using only for Loads and Stores
-map<string,uint32_t>RegisterFile;		// Modeling the 32 RISCV Registers
+map<int, int> Memory;       			// Modelling the Memory
+map<string,uint32_t>RegisterFile;		// Modeling the 32 RISCV General Purpose Registers
 
 const char *reg_names[] = {
             "zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
@@ -26,9 +26,8 @@ const uint32_t NUM_REGS = sizeof(reg_names) / sizeof(reg_names[0]);	// Calculate
 class RISCV {
 	
 private:
-    uint32_t pc;				// Program counter
-    //vector<uint8_t> mem;		// Memory
-    
+    uint32_t pc;						// Modeling Program counter
+   
 
 public:
     
@@ -69,7 +68,7 @@ public:
     }
 	
 	void print_memory() const {																// Function to Print the memory information in a compact format with register names and values
-        for (uint32_t i = 0; i < MEM_SIZE; i++) {
+        for (uint32_t i = 0; i < MEM_SIZE; i=i+1) {
             printf("%x: 0x%08x ", i, Memory[i]);
             if ((i + 1) % 8 == 0) {
                 printf("\n");
@@ -90,19 +89,23 @@ int main(int argc, char *argv[]) {
     RegisterFile["ra"] = 0;
     string memoryimage = "program.mem";
 
-    if (argc != 4) {
+    if (argc >= 4) {
         cerr << "*****Incorrect Number of Arguments Provided. Should be Used as follows: \n" << argv[0] << " <pc> <sp> <memoryimage>" << endl;
         return EXIT_FAILURE;
-    }
+    } else {
 
     // Parse PC and SP as 32-bit hexadecimal values
-    stringstream ss_pc(argv[1]);
-    ss_pc >> hex >> pc;
+    if(argv[1]){
+		stringstream ss_pc(argv[1]);
+		ss_pc >> hex >> pc;
+	} else {
+		
 
     stringstream ss_sp(argv[2]);
     ss_sp >> hex >> sp;
 
     memoryimage = argv[3];
+	}
 
     // printing the parsed arguments
     cout << "PC = 0x" << setfill('0') << setw(8) << hex << pc << endl;
@@ -112,13 +115,38 @@ int main(int argc, char *argv[]) {
 	/*for(uint32_t i=0;i<NUM_REGS;i++){					// initialize all GPRs with a given value
 	    RegisterFile[reg_names[i]] = 0;
 	}*/
+	ifstream memory_file(memoryimage);
+	int address,data;
+	if (memory_file.is_open()) {
+        
+        /*while (memory_file >> std::hex >> address >> data) {
+            Memory[address] = data;
+        }*/
+		std::string line;
+
+        while (std::getline(memory_file, line)) {
+            std::stringstream ss(line);
+            int address, data;
+
+            ss >> std::hex >> address;
+            ss.ignore(2, ' '); // Ignore the colon and space between address and data
+            ss >> std::hex >> data;
+
+            Memory[address] = data;
+        }
+
+        memory_file.close();
+    } else {
+        std::cerr << "Failed to open memory image file." << std::endl;
+        return 1;
+    }
    
 	cpu.set_pc(0x1000);
 	cpu.set_reg("t0",0x12345678);
 	cpu.get_reg("t0");
     cpu.initialize();
-    cpu.mem_write(0xfffe, 0x12345678);				// Write some data to memory
-    cpu.mem_write(0xffbc, 0xdeadbeef);
+    //cpu.mem_write(0xfffe, 0x12345678);					// Write some data to memory
+    //cpu.mem_write(0xffbc, 0xdeadbeef);
     cpu.print_regs();
 	cpu.print_memory();
 
@@ -126,3 +154,4 @@ int main(int argc, char *argv[]) {
 
 }
 
+// commands to use: g++ -o chk1 chkpt1.cpp ; ./chk1 98 76 program.mem
