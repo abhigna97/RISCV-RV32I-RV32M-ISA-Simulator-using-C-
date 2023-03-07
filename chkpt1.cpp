@@ -7,26 +7,30 @@
 #include <vector>
 #include <bits/stdc++.h>
 
-
 using namespace std;
+uint32_t pc=0,sp=0,ra=0;												// Modeling Program Counter, Stack Pointer, Return Address
+map <uint32_t, uint32_t> Memory;       									// Modelling the Memory
+map <string,uint32_t> RegisterFile {									// Modeling the 32 RISCV General Purpose Registers
+	{"zero", 0}, {"ra", ra}, {"sp", sp}, {"gp", 0}, {"tp", 0}, {"t0", 0}, {"t1", 0}, {"t2", 0},
+    {"s0", 0}, {"s1", 0}, {"a0", 0}, {"a1", 0}, {"a2", 0}, {"a3", 0}, {"a4", 0}, {"a5", 0},
+    {"a6", 0}, {"a7", 0}, {"s2", 0}, {"s3", 0}, {"s4", 0}, {"s5", 0}, {"s6", 0}, {"s7", 0},
+    {"s8", 0}, {"s9", 0}, {"s10", 0}, {"s11", 0}, {"t3", 0}, {"t4", 0}, {"t5", 0}, {"t6", 0}
+};
 
-map<int, int> Memory;       			// Modelling the Memory
-map<string,uint32_t>RegisterFile;		// Modeling the 32 RISCV General Purpose Registers
-
-const char *reg_names[] = {
+const char *reg_names[] = {												// Modeling the 32 32-bit GPRs
             "zero", "ra", "sp", "gp", "tp", "t0", "t1", "t2",
             "s0", "s1", "a0", "a1", "a2", "a3", "a4", "a5",
             "a6", "a7", "s2", "s3", "s4", "s5", "s6", "s7",
             "s8", "s9", "s10", "s11", "t3", "t4", "t5", "t6"};
 
-const uint32_t MEM_SIZE = 65536;  									// 64 KB
-const uint32_t WORD_SIZE = 8;    									// 8 bytes
-const uint32_t NUM_REGS = sizeof(reg_names) / sizeof(reg_names[0]);	// Calculate the number of registers: 32 in RISC-V
+const uint32_t MEM_SIZE  = 65536;  										// Size of Memory = 64 KB
+const uint32_t WORD_SIZE = 8;    										// SIze of Word = 8 bytes
+const uint32_t NUM_REGS  = sizeof(reg_names) / sizeof(reg_names[0]);	// Calculate the number of registers: 32 in RISC-V
 
 class RISCV {
 	
 private:
-    uint32_t pc;						// Modeling Program counter
+    //uint32_t pc = 0;													// Modeling Program counter
    
 
 public:
@@ -57,7 +61,7 @@ public:
 	}
 
     void print_regs() const {																// Function to Print the register information in a compact format with register names and values
-        printf("PC: 0x%08x\n", pc);
+        printf("PC:\t0x%08x\n",pc);
         for (uint32_t i = 0; i < NUM_REGS; i++) {
             printf("%s:\t0x%08x ", reg_names[i], RegisterFile[reg_names[i]]);
             if ((i + 1) % 4 == 0) {
@@ -68,9 +72,9 @@ public:
     }
 	
 	void print_memory() const {																// Function to Print the memory information in a compact format with register names and values
-        for (uint32_t i = 0; i < MEM_SIZE; i=i+1) {
-            printf("%x: 0x%08x ", i, Memory[i]);
-            if ((i + 1) % 8 == 0) {
+        for (uint32_t i = 0; i < MEM_SIZE; i=i+4) {
+            printf("%x:\t0x%08x\t", i, Memory[i]);
+            if ((i+4) % 24 == 0) {
                 printf("\n");
             }
         }
@@ -83,72 +87,59 @@ public:
 
 int main(int argc, char *argv[]) {
     RISCV cpu;   			 			// Create a RISC-V CPU instance
-    uint32_t pc,sp;
-	cpu.set_pc(0x0);					// initialize pc,sp,ra to 0
-    RegisterFile["sp"] = 0;
-    RegisterFile["ra"] = 0;
-    string memoryimage = "program.mem";
+    string memoryimage= "program.mem";
 
-    if (argc >= 4) {
+    if (argc > 4) {
         cerr << "*****Incorrect Number of Arguments Provided. Should be Used as follows: \n" << argv[0] << " <pc> <sp> <memoryimage>" << endl;
         return EXIT_FAILURE;
     } else {
-
-    // Parse PC and SP as 32-bit hexadecimal values
-    if(argv[1]){
-		stringstream ss_pc(argv[1]);
-		ss_pc >> hex >> pc;
-	} else {
-		
-
-    stringstream ss_sp(argv[2]);
-    ss_sp >> hex >> sp;
-
-    memoryimage = argv[3];
+		if(argc>1){								// Parse PC and SP as 32-bit hexadecimal values, and Memory Image File as a String
+			stringstream ss_pc(argv[1]);
+			ss_pc >> hex >> pc;
+		}
+		if(argc>2){
+			stringstream ss_sp(argv[2]);
+			ss_sp >> hex >> sp;
+		} 	
+		if(argc>3){
+			memoryimage = string(argv[3]);
+		}	
 	}
 
-    // printing the parsed arguments
-    cout << "PC = 0x" << setfill('0') << setw(8) << hex << pc << endl;
+    cout << "PC = 0x" << setfill('0') << setw(8) << hex << pc << endl;		// printing the parsed arguments
     cout << "SP = 0x" << setfill('0') << setw(8) << hex << sp << endl;
     cout << "Memory image filename = " << memoryimage << endl;
 	
-	/*for(uint32_t i=0;i<NUM_REGS;i++){					// initialize all GPRs with a given value
-	    RegisterFile[reg_names[i]] = 0;
-	}*/
-	ifstream memory_file(memoryimage);
-	int address,data;
+	ifstream memory_file(memoryimage);										// Loading the Memory Image into Memory Map
+	uint32_t address,data;
 	if (memory_file.is_open()) {
-        
-        /*while (memory_file >> std::hex >> address >> data) {
-            Memory[address] = data;
-        }*/
-		std::string line;
-
-        while (std::getline(memory_file, line)) {
-            std::stringstream ss(line);
-            int address, data;
-
-            ss >> std::hex >> address;
-            ss.ignore(2, ' '); // Ignore the colon and space between address and data
-            ss >> std::hex >> data;
-
+        string line;
+        while (getline(memory_file, line)) {
+            stringstream ss(line);
+            ss >> hex >> address;
+            ss.ignore(2, ' '); 												// Ignore the colon and space between address and data
+            ss >> hex >> data;
             Memory[address] = data;
         }
-
         memory_file.close();
     } else {
-        std::cerr << "Failed to open memory image file." << std::endl;
-        return 1;
+        cerr << "Failed to open memory image file." << endl;
+        return 0;
     }
-   
-	cpu.set_pc(0x1000);
-	cpu.set_reg("t0",0x12345678);
-	cpu.get_reg("t0");
-    cpu.initialize();
-    //cpu.mem_write(0xfffe, 0x12345678);					// Write some data to memory
+	
+ 	//cpu.set_pc(0x0);														// Set PC
+    //RegisterFile["sp"] = sp;												// Set SP
+    //RegisterFile["ra"] = ra;   											// Set RA
+	cpu.set_pc(pc);															// Set PC
+	cpu.set_reg("sp",sp);													// Set SP
+	cpu.set_reg("ra",ra);													// Set RA
+	cpu.set_reg("t0",0x12345678);											// Set a Register's Value
+	cpu.get_reg("t0");														// Get a Register's Value
+    //cpu.initialize();														// initialize PC and Registers
+    //cpu.mem_write(0xfffe, 0x12345678);									// Write data to a memory location
     //cpu.mem_write(0xffbc, 0xdeadbeef);
-    cpu.print_regs();
-	cpu.print_memory();
+    cpu.print_regs();														// Print the Registers and their Contents
+	cpu.print_memory();														// Print the Memory Locations and their Contents
 
     return EXIT_SUCCESS;
 
