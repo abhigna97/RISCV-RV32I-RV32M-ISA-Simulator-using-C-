@@ -264,12 +264,12 @@ instr->rd =  tempinstrn & 0x0000001F; // masking tempinstrn with mask value to g
 
 void Rtype_Instruction(struct Instruction *instr, int inputinstrn, int temp_arr[]){
    {
-            if(instr->funct_7 == 0) //add operation
+            if(instr->funct7 == 0) //add operation
             Register_Decode_Rtype(instr,inputinstrn); // calling the function to seperate register fields
             temp_arr[instr->rd] = (int)temp_arr[instr->rs1]+(int)temp_arr[instr->rs2]; //add operation
            // printf("%d\n",temp_arr[instr->rd]);
          }
-         else if(instr->funct_7 == 32){ //Subtract operation
+         else if(instr->funct7 == 32){ //Subtract operation
          {
             Register_Decode_Rtype(instr,inputinstrn); // calling the function to seperate register fields
             temp_arr[instr->rd] = (int)temp_arr[instr->rs1] - (int)temp_arr[instr->rs2]; //subtract operation
