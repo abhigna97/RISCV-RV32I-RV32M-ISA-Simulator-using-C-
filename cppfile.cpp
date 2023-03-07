@@ -1,4 +1,5 @@
 // https://www.geeksforgeeks.org/file-handling-c-classes/ 
+// we need to fill in the contents of the RegFile
 #include <iostream>
 #include <bits/stdc++.h>
 #include <fstream>
@@ -12,10 +13,6 @@ int StackSize;
 
 // stack<int> stack;
 int stackDS[StackSize-1:0];    // stack DataStructure - used as a stack
-
-
-
-
 
 int pushstack(int a){
 array[sp]=a;
@@ -36,7 +33,7 @@ return rs1-rs2;
 InstructionDecode(int Instruction, int PCValue){
 	int rs1, rs2, rd;
 
-    switch(Instruction[6:0]): {									// funct3 and funct7 of any two instruction can also at times represent I-field
+    switch(Instruction&0x7F): {									// funct3 and funct7 of any two instruction can also at times represent I-field
 		case 0b0110111: // LUI
 			break;
 		case 0b0010111: // AUIPC
@@ -47,7 +44,7 @@ InstructionDecode(int Instruction, int PCValue){
 			break;
 		case 0b1100011: // BEQ, BNE, BLT, BGE, BLTU, BGEU
 		{
-			switch(Instruction[14:12]):
+			switch(Instruction>>12 & 0x07):
 				case 0b000: // BEQ
 				break;
 				case 0b001: // BNE
@@ -63,7 +60,7 @@ InstructionDecode(int Instruction, int PCValue){
 		}
 		case 0b0000011: // LB, LH, LW, LBU, LHU
 		{
-			switch(Instruction[14:12]):
+			switch(Instruction>>12 & 0x7):
 				case 0b000:
 				break;
 				case 0b001:
@@ -77,7 +74,7 @@ InstructionDecode(int Instruction, int PCValue){
 		}
 		case 0b0100011: // SB, SH, SW
 		{
-			switch(Instruction[14:12])
+			switch(Instruction>>12 & 0x7)
 				case 0b000:
 				break;
 				case 0b001:
@@ -87,7 +84,7 @@ InstructionDecode(int Instruction, int PCValue){
 		}
 		case 0b0010011: // ADDI, SLTI, SLTIU, XORI, ORI, ANDI, SLLI, SRLI, SRAI
 		{
-	    	switch(Instruction[14:12]): {
+	    	switch(Instruction>>12 & 0x7): {
 				case 0b000:
 				break;
 				case 0b010:
@@ -103,7 +100,7 @@ InstructionDecode(int Instruction, int PCValue){
 				case 0b001: // SLLI
 				break;
 				case 0b101:
-					if(Instruction[31:25]= 0b0000000){
+					if(Instruction>>25&0x7F == 0b0000000){
 						// SRLI
 					} else {
 						// SRAI
@@ -112,26 +109,26 @@ InstructionDecode(int Instruction, int PCValue){
 			}
 		}
 		case 0b0110011:{ // ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND 
-			switch(Instruction[14:12]):{
+			switch(Instruction>>12 & 0x7){
 				case 0b000:
-					if(Instruction[31:25]= 0b0000000){ // ADD
-						rs1=RegisterFile[Instruction[19:15]];
-						rs2=RegisterFile[Instruction[24:20]];
+					if(Instruction>>25&0x7F == 0b0000000){ // ADD
+						rs1=RegisterFile[Instruction>>15&0x1F];
+						rs2=RegisterFile[Instruction>>20&0x1F];
 						// by now all of the fields in the Instruction have been taken care of.
 						// calling function ADD to run/execute the Instruction
 						cout<<"Exiting Decode Stage"<<endl;
 						// passing values onto the stack		
 						rd = ADDfunction(PCValue, rs1, rs2);
-						RegisterFile[Instruction[11:7]] = rd;
-					} else if(Instruction[31:25]= 0b0100000) { // SUB
-						rs1=RegisterFile[Instruction[19:15]];
-						rs2=RegisterFile[Instruction[24:20]];
+						RegisterFile[Instruction>>7 & 0x1F] = rd;
+					} else if(Instruction>>25&0x7F == 0b0100000) { // SUB
+						rs1=RegisterFile[Instruction>>15&0x1F];
+						rs2=RegisterFile[Instruction>>20&0x1F];
 						// by now all of the fields in the Instruction have been taken care of.
 						// calling function ADD to run/execute the Instruction
 						cout<<"Exiting Decode Stage"<<endl;
 						// passing values onto the stack		
 						rd = SUBfunction(PCValue, rs1, rs2);
-						RegisterFile[Instruction[11:7]] = rd;
+						RegisterFile[Instruction>>7 & 0x1F] = rd;
 					}
 					else
 					cout<<"Invalid Instruction\n";
@@ -146,9 +143,9 @@ InstructionDecode(int Instruction, int PCValue){
 				case 0b100: // XOR
 				break;
 				case 0b101:{ 
-					if(Instruction[31:25]= 0b0000000){ // SRL
+					if(Instruction>>25&0x7F == 0b0000000){ // SRL
 
-					} else if(Instruction[31:25]= 0b0100000){ // SRA
+					} else if(Instruction>>25&0x7F == 0b0100000){ // SRA
 
 					} else {
 						cout<<"Invalid Instruction"<<endl;
@@ -168,9 +165,9 @@ InstructionDecode(int Instruction, int PCValue){
 
 		break;
 		case 0b1110011: // ECALL 
-			if(Instruction[31:20] ==  0b000000000000){
+			if(Instruction>>20&0xFFF ==  0b000000000000){
 
-			} else if(Instruction[31:20] ==  0b000000000001){  // EBREAK
+			} else if(Instruction>>20&0xFFF ==  0b000000000001){  // EBREAK
 				
 			} else {
 				cout<<"Invalid Instruction"<<endl;
@@ -191,8 +188,8 @@ int main(int argc, char** argv)
 		cout << argv[i] << "\n";
     
     StackSize = int(argv[1]); // argv[0] is the program name
-    PCValue = int(argv[2]);
-	
+	//execute a loop if file opened successfully
+	while(myfile){
 		myfile>>PCValue>>Instruction;
 		InstructionDecode(Instruction,PCValue);
 	}
