@@ -81,7 +81,7 @@ uint32_t SRAI(){
 };
 uint32_t ADD(struct InstrFields *Fields){
 	//temp_arr[instr->rd] = (int)temp_arr[instr->rs1]+(int)temp_arr[instr->rs2];
-	RegisterFile[Fields->rd] = RegisterFile[Fields->rs1]+ RegisterFile[Fields->rs2];
+	//RegisterFile[Fields->rd] = RegisterFile[Fields->rs1]+ RegisterFile[Fields->rs2];
 	return 1;
 };
 uint32_t SUB(){
