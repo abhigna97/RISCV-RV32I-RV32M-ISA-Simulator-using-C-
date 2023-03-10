@@ -10,7 +10,7 @@
 #include "declarations.h"
 #include "functions.h"
 
-void RtypeExecute(struct InstrFields *Fields, uint32_t instruction, uint32_t temp_arr[]){
+void RtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t funct3temp,funct7temp;
 	funct3temp = Fields->funct3;
 	funct7temp = Fields->funct7;
@@ -33,7 +33,7 @@ void RtypeExecute(struct InstrFields *Fields, uint32_t instruction, uint32_t tem
 	}
 }
 
-void ItypeExecute(struct InstrFields *Fields, uint32_t instruction, uint32_t temp_arr[]){
+void ItypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t funct3temp;
 	funct3temp = Fields->funct3;
     switch(funct3temp){
@@ -46,7 +46,7 @@ void ItypeExecute(struct InstrFields *Fields, uint32_t instruction, uint32_t tem
 	}
 }
 
-void StypeExecute(struct InstrFields *Fields, uint32_t instruction, uint32_t temp_arr[]){
+void StypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t funct3temp;
 	switch(funct3temp){
 				case 0b000: SB(); break;		
@@ -56,7 +56,7 @@ void StypeExecute(struct InstrFields *Fields, uint32_t instruction, uint32_t tem
 	}
 }
 
-void BtypeExecute(struct InstrFields *Fields, uint32_t instruction, uint32_t temp_arr[]){
+void BtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t funct3temp;
 	funct3temp = Fields->funct3;
 	switch(funct3temp){
@@ -70,7 +70,7 @@ void BtypeExecute(struct InstrFields *Fields, uint32_t instruction, uint32_t tem
 	}
 }
 
-void UtypeExecute(struct InstrFields *Fields, uint32_t instruction, uint32_t temp_arr[]){
+void UtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t opcodetemp;
 	opcodetemp = Fields->opcode;
     switch(opcodetemp){
@@ -80,7 +80,7 @@ void UtypeExecute(struct InstrFields *Fields, uint32_t instruction, uint32_t tem
 	}
 }
 
-void JtypeExecute(struct InstrFields *Fields, uint32_t instruction, uint32_t temp_arr[]){
+void JtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	JAL();
 }
 
@@ -104,7 +104,7 @@ void RtypeDecode(struct InstrFields *Fields, uint32_t instruction){
     instrtemp 		= instrtemp >> 25; 				// shifting instrtemp by 25 positions to get funct7
     Fields->funct7 	= instrtemp & 0X0000007F; 		// masking instrtemp with a mask value to get value of funct7
 	printf("****R-TYPE:0x%08x****\nfunct7\t=0x%02x\n,rs2\t=0x%02x\n,rs1\t=0x%02x\n,funct3\t=0x%01x\n,rd\t=0x%02x\n,opcode\t=0x%02x\n",instruction,Fields->funct7,Fields->rs2,Fields->rs1,Fields->funct3,Fields->rd,Fields->opcode);
-	RtypeExecute(Fields, instruction, array);
+	RtypeExecute(Fields, instruction);
 }
 
 void ItypeDecode(struct InstrFields *Fields, uint32_t instruction){
@@ -124,7 +124,7 @@ void ItypeDecode(struct InstrFields *Fields, uint32_t instruction){
     instrtemp 		= instrtemp >> 20; 				// shifting instrtemp by 20 positions to get imm[11:0]
     Fields->imm_I11_0 	= instrtemp & 0x00000FFF; 	// masking instrtemp with a mask value to get value of imm[11:0]
     printf("****I-TYPE:0x%08x****\nimm[11:0]\t=0x%03x\n,rs1\t=0x%02x\n,funct3\t=0x%01x\n,rd\t=0x%02x\n,opcode\t=0x%02x\n",instruction,Fields->imm_I11_0,Fields->rs1,Fields->funct3,Fields->rd,Fields->opcode);
-	ItypeExecute(Fields, instruction, array);
+	ItypeExecute(Fields, instruction);
 }
 
 void StypeDecode(struct InstrFields *Fields, uint32_t instruction){
@@ -147,7 +147,7 @@ void StypeDecode(struct InstrFields *Fields, uint32_t instruction){
     instrtemp 		= instrtemp >> 25; 				// shifting instrtemp by 25 positions to get imm[11:5]
     Fields->imm_S11_5 = instrtemp & 0X0000007F; 	// masking instrtemp with a mask value to get value of imm[11:5]
 	printf("****S-TYPE:0x%08x****\nimm[11:5]\t=0x%02x\n,rs2\t=0x%02x\n,rs1\t=0x%02x\n,funct3\t=0x%01x\n,imm[4:0]\t=0x%02x\n,opcode\t=0x%02x\n",instruction,Fields->imm_S11_5,Fields->rs2,Fields->rs1,Fields->funct3,Fields->imm_S4_0,Fields->opcode);
-	StypeExecute(Fields, instruction, array);
+	StypeExecute(Fields, instruction);
 }
 
 void BtypeDecode(struct InstrFields *Fields, uint32_t instruction){
@@ -176,7 +176,7 @@ void BtypeDecode(struct InstrFields *Fields, uint32_t instruction){
     instrtemp 		= instrtemp >> 31; 				// shifting instrtemp by 25 positions to get imm[11:5]
     Fields->imm_B12 = instrtemp & 0X00000001; 		// masking instrtemp with a mask value to get value of imm[11:5]
 	printf("****B-TYPE:0x%08x****\nimm[12]\t=%0x\n,imm[10:5]\t=%0x\n,rs2\t=%0x\n,rs1\t=%0x\n,funct3\t=%0x\n,imm[4:1]\t=%0x\n,imm[11]\t=%0x\n,opcode\t=%0x\n",instruction,Fields->imm_B12,Fields->imm_B10_5,Fields->rs2,Fields->rs1,Fields->funct3,Fields->imm_B4_1,Fields->imm_B11,Fields->opcode);
-	BtypeExecute(Fields, instruction, array);
+	BtypeExecute(Fields, instruction);
 }
 
 void UtypeDecode(struct InstrFields *Fields, uint32_t instruction){
@@ -190,7 +190,7 @@ void UtypeDecode(struct InstrFields *Fields, uint32_t instruction){
     instrtemp		= instrtemp >> 12; 				// shifting instrtemp by 12 positions to get imm[31:12]
     Fields->imm_U31_12 	= instrtemp & 0x000FFFFF; 		// masking instrtemp with a mask value to get value of imm[31:12]
 	printf("****U-TYPE:0x%08x****\nimm[31:12]\t=0x%05x\n,rd\t=0x%02x\n,opcode\t=0x%02x\n",instruction,Fields->imm_U31_12,Fields->rd,Fields->opcode);
-	UtypeExecute(Fields, instruction, array);
+	UtypeExecute(Fields, instruction);
 }
 
 void JtypeDecode(struct InstrFields *Fields, uint32_t instruction){
@@ -213,7 +213,7 @@ void JtypeDecode(struct InstrFields *Fields, uint32_t instruction){
     instrtemp 		= instrtemp >> 31; 				// shifting instrtemp by 20 positions to get imm[20]
     Fields->imm_J20	= instrtemp & 0x00000001; 		// masking instrtemp with a mask value to get value of imm[20]
 	printf("****J-TYPE:0x%08x****\nimm[20]\t=0x%01x\n,imm[10:1]\t=0x%03x\n,imm[11]\t=0x%01x\n,imm[19:12]\t=0x%02x\n,rd\t=0x%02x\n,opcode\t=0x%02x\n",instruction,Fields->imm_J20,Fields->imm_J10_1,Fields->imm_J11,Fields->imm_J19_12,Fields->rd,Fields->opcode);
-	JtypeExecute(Fields, instruction, array);
+	JtypeExecute(Fields, instruction);
 }
 
 
