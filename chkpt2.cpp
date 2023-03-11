@@ -34,15 +34,28 @@ void RtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 }
 
 void ItypeExecute(struct InstrFields *Fields, uint32_t instruction){
-	uint32_t funct3temp;
+	uint32_t opcodetemp,funct3temp;
+	opcodetemp = Fields->opcode;
 	funct3temp = Fields->funct3;
-    switch(funct3temp){
-				case 0b000: LB(); break;
-				case 0b001: LH(); break;
-				case 0b010: LW(); break;
-				case 0b100: LBU(); break;
-				case 0b101: LHU(); break;
-				default : break;
+	switch(opcodetemp){
+    case 0b0000011:	switch(funct3temp){
+						case 0b000: LB(); break;
+						case 0b001: LH(); break;
+						case 0b010: LW(); break;
+						case 0b100: LBU(); break;
+						case 0b101: LHU(); break;
+						default : break;
+					} break;
+	case 0b0010011:	switch(funct3temp){
+						case 0b000: ADDI(); break;
+						case 0b010: SLTI(); break;
+						case 0b011: SLTIU(); break;
+						case 0b100: XORI(); break;
+						case 0b110: ORI(); break;
+						case 0b111: ANDI(); break;
+						default : break;
+					} break;
+	default : break;
 	}
 }
 
