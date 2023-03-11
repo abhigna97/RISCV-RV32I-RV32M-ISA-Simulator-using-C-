@@ -19,10 +19,10 @@ void RtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 									case 0b000: ADD(Fields,RegisterFile);printf("I am in RTypeExecute and calling ADD function\n");break;
 									case 0b001: SLL();	break;
 									case 0b010: SLT();	break;
-									case 0b011: SLTU();	break;
+									case 0b011: SLTU(Fields,RegisterFile);	printf("I am in RTypeExecute and calling SLTU function\n");break;
 									case 0b100: XOR();	break;
 									case 0b101: SRL();	break;
-									case 0b110: OR();	break;
+									case 0b110: OR(Fields,RegisterFile);printf("I am in RTypeExecute and calling OR function\n");break;
 									case 0b111: AND();	break;
 								} break;
 				case 0b0100000: switch (funct3temp){
@@ -34,9 +34,10 @@ void RtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 }
 
 void ItypeExecute(struct InstrFields *Fields, uint32_t instruction){
-	uint32_t opcodetemp,funct3temp;
+	uint32_t opcodetemp,funct3temp,imm11_5temp;
 	opcodetemp = Fields->opcode;
 	funct3temp = Fields->funct3;
+	imm11_5temp=Fields->imm_I11_5;
 	switch(opcodetemp){
     case 0b0000011:	switch(funct3temp){
 						case 0b000: LB(); break;
@@ -48,9 +49,15 @@ void ItypeExecute(struct InstrFields *Fields, uint32_t instruction){
 					} break;
 	case 0b0010011:	switch(funct3temp){
 						case 0b000: ADDI(); break;
+						case 0b001: SLLI(); break;
 						case 0b010: SLTI(); break;
 						case 0b011: SLTIU(); break;
 						case 0b100: XORI(); break;
+						case 0b101: switch(imm11_5temp){
+										case 0b0000000:	SRLI(); break;
+										case 0b0100000: SRAI(); break;
+										default: break;
+									} break;
 						case 0b110: ORI(); break;
 						case 0b111: ANDI(); break;
 						default : break;
@@ -133,6 +140,12 @@ void ItypeDecode(struct InstrFields *Fields, uint32_t instruction){
     instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
     instrtemp 		= instrtemp >> 15; 				// shifting instrtemp by 15 positions to get rs1
     Fields->rs1 	= instrtemp & 0x0000001F; 		// masking instrtemp with a mask value to get value of rs1
+	instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
+    instrtemp 		= instrtemp >> 20; 				// shifting instrtemp by 20 positions to get shamt/imm[4:0]
+    Fields->shamt 	= instrtemp & 0x0000001F; 		// masking instrtemp with a mask value to get value of shamt/imm[4:0]
+	instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
+    instrtemp 		= instrtemp >> 25; 				// shifting instrtemp by 25 positions to get imm[11:5]
+    Fields->shamt 	= instrtemp & 0x0000007F; 		// masking instrtemp with a mask value to get value of imm[11:5]
 	instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
     instrtemp 		= instrtemp >> 20; 				// shifting instrtemp by 20 positions to get imm[11:0]
     Fields->imm_I11_0 	= instrtemp & 0x00000FFF; 	// masking instrtemp with a mask value to get value of imm[11:0]
