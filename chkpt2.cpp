@@ -24,10 +24,12 @@ void RtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 									case 0b101: SRL(Fields,RegisterFile);	break;
 									case 0b110: OR(Fields,RegisterFile);printf("I am in RTypeExecute and calling OR function\n");break;
 									case 0b111: AND(Fields,RegisterFile);	break;
+									default: break;
 								} break;
 				case 0b0100000: switch (funct3temp){
 									case 0b000: SUB(Fields,RegisterFile);break;
 									case 0b101: SRA(Fields,RegisterFile);break;
+									default : break;
 								} break;
 				default : break;
 	}
@@ -40,11 +42,11 @@ void ItypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	imm11_5temp=Fields->imm_I11_5;
 	switch(opcodetemp){
     case 0b0000011:	switch(funct3temp){
-						case 0b000: LB(Fields,RegisterFile); break;
-						case 0b001: LH(Fields,RegisterFile); break;
-						case 0b010: LW(Fields,RegisterFile); break;
-						case 0b100: LBU(Fields,RegisterFile); break;
-						case 0b101: LHU(Fields,RegisterFile); break;
+						case 0b000: LB(Fields,RegisterFile,Memory); break;
+						case 0b001: LH(Fields,RegisterFile,Memory); break;
+						case 0b010: LW(Fields,RegisterFile,Memory); break;
+						case 0b100: LBU(Fields,RegisterFile,Memory); printf("I am in RTypeExecute and calling LBU function\n");break;
+						case 0b101: LHU(Fields,RegisterFile,Memory); break;
 						default : break;
 					} break;
 	case 0b0010011:	switch(funct3temp){
@@ -52,9 +54,9 @@ void ItypeExecute(struct InstrFields *Fields, uint32_t instruction){
 						case 0b001: SLLI(Fields,RegisterFile); break;
 						case 0b010: SLTI(Fields,RegisterFile); break;
 						case 0b011: SLTIU(Fields,RegisterFile); break;
-						case 0b100: XORI(Fields,RegisterFile); break;
+						case 0b100: XORI(Fields,RegisterFile); printf("I am in RTypeExecute and calling XORI function\n");break;
 						case 0b101: switch(imm11_5temp){
-										case 0b0000000:	SRLI(Fields,RegisterFile); break;
+										case 0b0000000:	SRLI(Fields,RegisterFile); printf("I am in RTypeExecute and calling SRLI function\n");break;
 										case 0b0100000: SRAI(Fields,RegisterFile); break;
 										default: break;
 									} break;
@@ -69,9 +71,9 @@ void ItypeExecute(struct InstrFields *Fields, uint32_t instruction){
 void StypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t funct3temp;
 	switch(funct3temp){
-				case 0b000: SB(Fields,RegisterFile); break;		
-				case 0b001: SH(Fields,RegisterFile); break;
-				case 0b010: SW(Fields,RegisterFile); break;
+				case 0b000: SB(Fields,RegisterFile,Memory); break;		
+				case 0b001: SH(Fields,RegisterFile,Memory); break;
+				case 0b010: SW(Fields,RegisterFile,Memory); printf("I am in RTypeExecute and calling SW function\n");break;
 				default : break;
 	}
 }
@@ -81,11 +83,11 @@ void BtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	funct3temp = Fields->funct3;
 	switch(funct3temp){
 				case 0b000: BEQ(Fields,RegisterFile); break;
-				case 0b001: BNE(Fields,RegisterFile); break;
+				case 0b001: BNE(Fields,RegisterFile); printf("I am in RTypeExecute and calling BNE function\n");break;
 				case 0b100: BLT(Fields,RegisterFile); break;
 				case 0b101: BGE(Fields,RegisterFile); break;
 				case 0b110: BLTU(Fields,RegisterFile); break;
-				case 0b111: BGEU(Fields,RegisterFile); break;
+				case 0b111: BGEU(Fields,RegisterFile); printf("I am in RTypeExecute and calling BGEU function\n");break;
 				default : break;
 	}
 }
@@ -95,7 +97,7 @@ void UtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	opcodetemp = Fields->opcode;
     switch(opcodetemp){
 				case 0b0110111: LUI(Fields,RegisterFile); break;
-				case 0b0010111: AUIPC(Fields,RegisterFile); break;
+				case 0b0010111: AUIPC(Fields,RegisterFile); printf("I am in RTypeExecute and calling AUIPC function\n");break;
 				default : break;
 	}
 }
@@ -105,7 +107,7 @@ void JtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 }
 
 void RtypeDecode(struct InstrFields *Fields, uint32_t instruction){
-	uint32_t instrtemp;					// temporary variable to store the Instruction from file
+	uint32_t instrtemp;								// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
@@ -128,7 +130,7 @@ void RtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 }
 
 void ItypeDecode(struct InstrFields *Fields, uint32_t instruction){
-	uint32_t instrtemp; 					// temporary variable to store the Instruction from file
+	uint32_t instrtemp; 							// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
@@ -275,6 +277,7 @@ int main(int argc, char *argv[]) {
 		if(argc>2){
 			stringstream ss_sp(argv[2]);
 			ss_sp >> hex >> sp;
+			set_reg(2,sp);
 		} 	
 		if(argc>3){
 			memoryimage = string(argv[3]);
