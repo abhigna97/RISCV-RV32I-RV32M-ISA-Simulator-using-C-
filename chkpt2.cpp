@@ -17,17 +17,17 @@ void RtypeExecute(struct InstrFields *Fields, uint32_t instruction){
     switch(funct7temp){
 				case 0b0000000: switch (funct3temp){
 									case 0b000: ADD(Fields,RegisterFile);printf("I am in RTypeExecute and calling ADD function\n");break;
-									case 0b001: SLL();	break;
-									case 0b010: SLT();	break;
+									case 0b001: SLL(Fields,RegisterFile);	break;
+									case 0b010: SLT(Fields,RegisterFile);	break;
 									case 0b011: SLTU(Fields,RegisterFile);	printf("I am in RTypeExecute and calling SLTU function\n");break;
-									case 0b100: XOR();	break;
-									case 0b101: SRL();	break;
+									case 0b100: XOR(Fields,RegisterFile);	break;
+									case 0b101: SRL(Fields,RegisterFile);	break;
 									case 0b110: OR(Fields,RegisterFile);printf("I am in RTypeExecute and calling OR function\n");break;
-									case 0b111: AND();	break;
+									case 0b111: AND(Fields,RegisterFile);	break;
 								} break;
 				case 0b0100000: switch (funct3temp){
-									case 0b000: SUB();break;
-									case 0b101: SRA();break;
+									case 0b000: SUB(Fields,RegisterFile);break;
+									case 0b101: SRA(Fields,RegisterFile);break;
 								} break;
 				default : break;
 	}
@@ -40,26 +40,26 @@ void ItypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	imm11_5temp=Fields->imm_I11_5;
 	switch(opcodetemp){
     case 0b0000011:	switch(funct3temp){
-						case 0b000: LB(); break;
-						case 0b001: LH(); break;
-						case 0b010: LW(); break;
-						case 0b100: LBU(); break;
-						case 0b101: LHU(); break;
+						case 0b000: LB(Fields,RegisterFile); break;
+						case 0b001: LH(Fields,RegisterFile); break;
+						case 0b010: LW(Fields,RegisterFile); break;
+						case 0b100: LBU(Fields,RegisterFile); break;
+						case 0b101: LHU(Fields,RegisterFile); break;
 						default : break;
 					} break;
 	case 0b0010011:	switch(funct3temp){
-						case 0b000: ADDI(); break;
-						case 0b001: SLLI(); break;
-						case 0b010: SLTI(); break;
-						case 0b011: SLTIU(); break;
-						case 0b100: XORI(); break;
+						case 0b000: ADDI(Fields,RegisterFile); break;
+						case 0b001: SLLI(Fields,RegisterFile); break;
+						case 0b010: SLTI(Fields,RegisterFile); break;
+						case 0b011: SLTIU(Fields,RegisterFile); break;
+						case 0b100: XORI(Fields,RegisterFile); break;
 						case 0b101: switch(imm11_5temp){
-										case 0b0000000:	SRLI(); break;
-										case 0b0100000: SRAI(); break;
+										case 0b0000000:	SRLI(Fields,RegisterFile); break;
+										case 0b0100000: SRAI(Fields,RegisterFile); break;
 										default: break;
 									} break;
-						case 0b110: ORI(); break;
-						case 0b111: ANDI(); break;
+						case 0b110: ORI(Fields,RegisterFile); break;
+						case 0b111: ANDI(Fields,RegisterFile); break;
 						default : break;
 					} break;
 	default : break;
@@ -69,9 +69,9 @@ void ItypeExecute(struct InstrFields *Fields, uint32_t instruction){
 void StypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t funct3temp;
 	switch(funct3temp){
-				case 0b000: SB(); break;		
-				case 0b001: SH(); break;
-				case 0b010: SW(); break;
+				case 0b000: SB(Fields,RegisterFile); break;		
+				case 0b001: SH(Fields,RegisterFile); break;
+				case 0b010: SW(Fields,RegisterFile); break;
 				default : break;
 	}
 }
@@ -80,12 +80,12 @@ void BtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t funct3temp;
 	funct3temp = Fields->funct3;
 	switch(funct3temp){
-				case 0b000: BEQ(); break;
-				case 0b001: BNE(); break;
-				case 0b100: BLT(); break;
-				case 0b101: BGE(); break;
-				case 0b110: BLTU(); break;
-				case 0b111: BGEU(); break;
+				case 0b000: BEQ(Fields,RegisterFile); break;
+				case 0b001: BNE(Fields,RegisterFile); break;
+				case 0b100: BLT(Fields,RegisterFile); break;
+				case 0b101: BGE(Fields,RegisterFile); break;
+				case 0b110: BLTU(Fields,RegisterFile); break;
+				case 0b111: BGEU(Fields,RegisterFile); break;
 				default : break;
 	}
 }
@@ -94,14 +94,14 @@ void UtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t opcodetemp;
 	opcodetemp = Fields->opcode;
     switch(opcodetemp){
-				case 0b0110111: LUI(); break;
-				case 0b0010111: AUIPC(); break;
+				case 0b0110111: LUI(Fields,RegisterFile); break;
+				case 0b0010111: AUIPC(Fields,RegisterFile); break;
 				default : break;
 	}
 }
 
 void JtypeExecute(struct InstrFields *Fields, uint32_t instruction){
-	JAL();
+	JAL(Fields,RegisterFile);
 }
 
 void RtypeDecode(struct InstrFields *Fields, uint32_t instruction){
