@@ -45,85 +45,85 @@
         printf("\n");
     }
 	
-	uint32_t LUI(){
+	uint32_t LUI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t AUIPC(){
+	uint32_t AUIPC(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t JAL(){
+	uint32_t JAL(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t JALR(){
+	uint32_t JALR(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t BEQ(){
+	uint32_t BEQ(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t BNE(){
+	uint32_t BNE(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t BLT(){
+	uint32_t BLT(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t BGE(){
+	uint32_t BGE(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t BLTU(){
+	uint32_t BLTU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t BGEU(){
+	uint32_t BGEU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t LB(){
+	uint32_t LB(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t LH(){
+	uint32_t LH(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t LW(){
+	uint32_t LW(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t LBU(){
+	uint32_t LBU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t LHU(){
+	uint32_t LHU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1; 
 	};
-	uint32_t SB(){
+	uint32_t SB(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t SH(){
+	uint32_t SH(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t SW(){
+	uint32_t SW(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t ADDI(){
+	uint32_t ADDI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t SLTI(){
+	uint32_t SLTI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t SLTIU(){
+	uint32_t SLTIU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t XORI(){
+	uint32_t XORI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t ORI(){
+	uint32_t ORI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t ANDI(){
+	uint32_t ANDI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t SLLI(){
+	uint32_t SLLI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t SRLI(){
+	uint32_t SRLI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t SRAI(){
+	uint32_t SRAI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
 	
@@ -136,13 +136,13 @@
 		return 1;
 	};
 	
-	uint32_t SUB(){
+	uint32_t SUB(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t SLL(){
+	uint32_t SLL(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t SLT(){
+	uint32_t SLT(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
 	uint32_t SLTU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
@@ -155,13 +155,13 @@
 		print_regs();
 		return 1;
 	};
-	uint32_t XOR(){
+	uint32_t XOR(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t SRL(){
+	uint32_t SRL(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t SRA(){
+	uint32_t SRA(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
 	uint32_t OR(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
@@ -172,15 +172,15 @@
 		print_regs();
 		return 1;
 	};
-	uint32_t AND(){
+	uint32_t AND(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t FENCE(){
+	uint32_t FENCE(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t ECALL(){
+	uint32_t ECALL(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
-	uint32_t EBREAK(){
+	uint32_t EBREAK(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
