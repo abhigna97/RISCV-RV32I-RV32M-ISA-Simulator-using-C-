@@ -26,6 +26,8 @@ struct InstrFields{					//Struct type for Instruction that holds different part 
     unsigned int funct3;        	//Funct 3 
     unsigned int funct7;        	//funct 7
     unsigned int imm_I11_0;         //Immediate value for I Instruction format
+	unsigned int imm_I11_5;         //Imm[11:5] value for I Instruction format
+	unsigned int shamt;				//shamt(Imm[4:0]) in place of rs2 for R-type SLLI,SRLI,SRAI
     unsigned int imm_S4_0;         	//Imm[4:0] for S type format
     unsigned int imm_S11_5;         //Imm[11:5] for S type format
     unsigned int imm_S11_0;         //Imm[11:0] for S type format
@@ -40,7 +42,6 @@ struct InstrFields{					//Struct type for Instruction that holds different part 
 	unsigned int imm_J10_1;			//Imm[10:1] for J type format
 	unsigned int imm_J20;			//Imm[20] for J type format
 	unsigned int imm_J20_1;			//Imm[20:1] for J type format
-	unsigned int shamt;				//shamt in place of rs2 for R-type SLLI,SRLI,SRAI
 	unsigned int fm;				//fm for FENCE
 	unsigned int pred;				//pred for FENCE
 	unsigned int succ;				//succ for FENCE
