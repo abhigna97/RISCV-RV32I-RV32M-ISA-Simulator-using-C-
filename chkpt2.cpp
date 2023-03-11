@@ -98,7 +98,7 @@ void JtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 }
 
 void RtypeDecode(struct InstrFields *Fields, uint32_t instruction){
-	uint32_t instrtemp,array[]={};					// temporary variable to store the Instruction from file
+	uint32_t instrtemp;					// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
@@ -121,7 +121,7 @@ void RtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 }
 
 void ItypeDecode(struct InstrFields *Fields, uint32_t instruction){
-	uint32_t instrtemp,array[]={}; 					// temporary variable to store the Instruction from file
+	uint32_t instrtemp; 					// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
@@ -141,7 +141,7 @@ void ItypeDecode(struct InstrFields *Fields, uint32_t instruction){
 }
 
 void StypeDecode(struct InstrFields *Fields, uint32_t instruction){
-	uint32_t instrtemp,array[]={}; 					// temporary variable to store the Instruction from file
+	uint32_t instrtemp,immtemp; 					// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
@@ -159,12 +159,15 @@ void StypeDecode(struct InstrFields *Fields, uint32_t instruction){
     instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
     instrtemp 		= instrtemp >> 25; 				// shifting instrtemp by 25 positions to get imm[11:5]
     Fields->imm_S11_5 = instrtemp & 0X0000007F; 	// masking instrtemp with a mask value to get value of imm[11:5]
-	printf("****S-TYPE:0x%08x****\nimm[11:5]\t=0x%02x\n,rs2\t=0x%02x\n,rs1\t=0x%02x\n,funct3\t=0x%01x\n,imm[4:0]\t=0x%02x\n,opcode\t=0x%02x\n",instruction,Fields->imm_S11_5,Fields->rs2,Fields->rs1,Fields->funct3,Fields->imm_S4_0,Fields->opcode);
+	immtemp 		= Fields->imm_S11_5 << 5;		// combining parts of immediate field to form a single immediate field
+	immtemp			= immtemp | Fields->imm_S4_0;
+	Fields->imm_S11_0 = immtemp;
+	printf("****S-TYPE:0x%08x****\nimm[11:0]\t=0x%02x\n,imm[11:5]\t=0x%02x\n,rs2\t=0x%02x\n,rs1\t=0x%02x\n,funct3\t=0x%01x\n,imm[4:0]\t=0x%02x\n,opcode\t=0x%02x\n",instruction,Fields->imm_S11_0,Fields->imm_S11_5,Fields->rs2,Fields->rs1,Fields->funct3,Fields->imm_S4_0,Fields->opcode);
 	StypeExecute(Fields, instruction);
 }
 
 void BtypeDecode(struct InstrFields *Fields, uint32_t instruction){
-	uint32_t instrtemp,array[]={}; 					// temporary variable to store the Instruction from file
+	uint32_t instrtemp,immtemp; 					// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
@@ -188,12 +191,19 @@ void BtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 	instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
     instrtemp 		= instrtemp >> 31; 				// shifting instrtemp by 25 positions to get imm[11:5]
     Fields->imm_B12 = instrtemp & 0X00000001; 		// masking instrtemp with a mask value to get value of imm[11:5]
-	printf("****B-TYPE:0x%08x****\nimm[12]\t=%0x\n,imm[10:5]\t=%0x\n,rs2\t=%0x\n,rs1\t=%0x\n,funct3\t=%0x\n,imm[4:1]\t=%0x\n,imm[11]\t=%0x\n,opcode\t=%0x\n",instruction,Fields->imm_B12,Fields->imm_B10_5,Fields->rs2,Fields->rs1,Fields->funct3,Fields->imm_B4_1,Fields->imm_B11,Fields->opcode);
+	immtemp 		= Fields->imm_B12 << 1;			// combining parts of immediate field to form a single immediate field
+	immtemp			= immtemp | Fields->imm_B11;
+	immtemp			= immtemp << 6;
+	immtemp			= immtemp | Fields->imm_B10_5;
+	immtemp			= immtemp << 4;
+	immtemp			= immtemp | Fields->imm_B4_1;
+	Fields->imm_B12_1 = immtemp;
+	printf("****B-TYPE:0x%08x****\nimm[12:1]\t=%0x\n,imm[12]\t=%0x\n,imm[10:5]\t=%0x\n,rs2\t=%0x\n,rs1\t=%0x\n,funct3\t=%0x\n,imm[4:1]\t=%0x\n,imm[11]\t=%0x\n,opcode\t=%0x\n",instruction,Fields->imm_B12_1,Fields->imm_B12,Fields->imm_B10_5,Fields->rs2,Fields->rs1,Fields->funct3,Fields->imm_B4_1,Fields->imm_B11,Fields->opcode);
 	BtypeExecute(Fields, instruction);
 }
 
 void UtypeDecode(struct InstrFields *Fields, uint32_t instruction){
-	uint32_t instrtemp,array[]={}; 					// temporary variable to store the Instruction from file
+	uint32_t instrtemp; 					// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
@@ -207,7 +217,7 @@ void UtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 }
 
 void JtypeDecode(struct InstrFields *Fields, uint32_t instruction){
-	uint32_t instrtemp,array[]={}; 					// temporary variable to store the Instruction from file
+	uint32_t instrtemp,immtemp; 					// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
@@ -225,7 +235,14 @@ void JtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 	instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
     instrtemp 		= instrtemp >> 31; 				// shifting instrtemp by 20 positions to get imm[20]
     Fields->imm_J20	= instrtemp & 0x00000001; 		// masking instrtemp with a mask value to get value of imm[20]
-	printf("****J-TYPE:0x%08x****\nimm[20]\t=0x%01x\n,imm[10:1]\t=0x%03x\n,imm[11]\t=0x%01x\n,imm[19:12]\t=0x%02x\n,rd\t=0x%02x\n,opcode\t=0x%02x\n",instruction,Fields->imm_J20,Fields->imm_J10_1,Fields->imm_J11,Fields->imm_J19_12,Fields->rd,Fields->opcode);
+	immtemp 		= Fields->imm_J20 << 8;			// combining parts of immediate field to form a single immediate field
+	immtemp			= immtemp | Fields->imm_J19_12;
+	immtemp			= immtemp << 1;
+	immtemp			= immtemp | Fields->imm_J11;
+	immtemp			= immtemp << 10;
+	immtemp			= immtemp | Fields->imm_J10_1;
+	Fields->imm_J20_1 = immtemp;
+	printf("****J-TYPE:0x%08x****\nimm[20]\t=0x%01x\n,imm[20]\t=0x%01x\n,imm[10:1]\t=0x%03x\n,imm[11]\t=0x%01x\n,imm[19:12]\t=0x%02x\n,rd\t=0x%02x\n,opcode\t=0x%02x\n",instruction,Fields->imm_J20_1,Fields->imm_J20,Fields->imm_J10_1,Fields->imm_J11,Fields->imm_J19_12,Fields->rd,Fields->opcode);
 	JtypeExecute(Fields, instruction);
 }
 
