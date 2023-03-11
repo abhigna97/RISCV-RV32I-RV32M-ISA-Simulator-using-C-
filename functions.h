@@ -145,7 +145,14 @@
 	uint32_t SLT(){
 		return 1;
 	};
-	uint32_t SLTU(){
+	uint32_t SLTU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->rd,Fields->rs1,Fields->rs2);
+		if(RegisterFile[Fields->rs1] < RegisterFile[Fields->rs2])
+				RegisterFile[Fields->rd] = 1;        //set_reg(Fields->rd,RegisterFile[Fields->rd]);
+		else	RegisterFile[Fields->rd] = 0;
+		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x\n",RegisterFile[Fields->rd],RegisterFile[Fields->rs1],RegisterFile[Fields->rs2]);
+		print_regs();
 		return 1;
 	};
 	uint32_t XOR(){
@@ -157,7 +164,12 @@
 	uint32_t SRA(){
 		return 1;
 	};
-	uint32_t OR(){
+	uint32_t OR(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->rd,Fields->rs1,Fields->rs2);
+		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] | RegisterFile[Fields->rs2];        //set_reg(Fields->rd,RegisterFile[Fields->rd]);
+		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x\n",RegisterFile[Fields->rd],RegisterFile[Fields->rs1],RegisterFile[Fields->rs2]);
+		print_regs();
 		return 1;
 	};
 	uint32_t AND(){
