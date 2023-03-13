@@ -46,6 +46,11 @@
     }
 	
 	uint32_t LUI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+	print_regs();
+		printf("Fields->imm_U31_12=0x%05x,Fields->rd=0x%02x\n",Fields->imm_U31_12,Fields->rd);
+		RegisterFile[Fields->rd] = Fields->imm_U31_12 <<12 & 0xfffff000 ;        
+		printf("Fields->imm_U31_12=0x%05x,Fields->rd=0x%02x\n",Fields->imm_U31_12,Fields->rd);
+		print_regs();
 		return 1;
 	};
 	uint32_t AUIPC(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
@@ -68,6 +73,14 @@
 		return 1;
 	};
 	uint32_t BEQ(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		printf("Fields->imm_B12_1=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x",Fields->imm_B12_1,Fields->rs2,Fields->rs1);
+		int Immediate_Signed;
+		if(Fields->imm_B12 >>11) Immediate_Signed = static_cast<int>(Fields->imm_B12 | 0xFFFFF000);
+		else Immediate_Signed = static_cast<int>(Fields->imm_B12);
+		if(RegisterFile[Fields->rs1]==RegisterFile[Fields->rs2]) pc+=Immediate_Signed - 4;        
+		printf("Fields->imm_B12_1=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x",Fields->imm_B12_1,Fields->rs2,Fields->rs1);
+		print_regs();
 		return 1;
 	};
 	uint32_t BNE(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
@@ -89,6 +102,11 @@
 		return 1;
 	};
 	uint32_t BLTU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		printf("Fields->imm_B12_1=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x",Fields->imm_B12_1,Fields->rs2,Fields->rs1);
+		if(RegisterFile[Fields->rs1]<RegisterFile[Fields->rs2]) pc+=Fields->imm_B12_1 - 4;        
+		printf("Fields->imm_B12_1=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x",Fields->imm_B12_1,Fields->rs2,Fields->rs1);
+		print_regs();
 		return 1;
 	};
 	uint32_t BGEU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
@@ -110,6 +128,14 @@
 		return 1;
 	};
 	uint32_t LW(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint32_t>& Memory){
+		print_regs();
+		printf("Fields->imm_I11_0=0x%03x,Fields->rs1=0x%02x,Fields->rd=0x%02x",Fields->imm_I11_0,Fields->rs1,Fields->rd);
+		int Immediate_Signed;
+		if(Fields->imm_I11_0 >>11) Immediate_Signed = static_cast<int>(Fields->imm_I11_0 | 0xFFFFF000);
+		else Immediate_Signed = static_cast<int>(Fields->imm_I11_0);
+		RegisterFile[Fields->rd] = Memory[Immediate_Signed+RegisterFile[Fields->rs1]];
+		printf("Fields->imm_B12_1=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x",Fields->imm_B12_1,Fields->rs2,Fields->rs1);
+		print_regs();
 		return 1;
 	};
 	uint32_t LBU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint32_t>& Memory){
@@ -131,6 +157,14 @@
 		return 1;
 	};
 	uint32_t SH(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint32_t>& Memory){
+	print_regs();
+		printf("Fields->imm_S11_0=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x",Fields->imm_S11_0,Fields->rs2,Fields->rs1);
+		int Immediate_Signed;
+		if(Fields->imm_S11_0 >>11) Immediate_Signed = static_cast<int>(Fields->imm_S11_0 | 0xFFFFF000);
+		else Immediate_Signed = static_cast<int>(Fields->imm_S11_0);
+		Memory[RegisterFile[Fields->rs1] + Immediate_Signed] = RegisterFile[Fields->rs2] & 0x0000FFFF;        
+		printf("Fields->imm_S11_0=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x",Fields->imm_S11_0,Fields->rs2,Fields->rs1);
+		print_regs();
 		return 1;
 	};
 	uint32_t SW(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint32_t>& Memory){
@@ -152,6 +186,11 @@
 		return 1;
 	};
 	uint32_t SLTIU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		printf("Fields->imm_I11_0=0x%03x,Fields->rs1=0x%02x,Fields->rd=0x%02x",Fields->imm_I11_0,Fields->rs1,Fields->rd);
+		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] < Fields->imm_I11_0 ? 1 : 0;     
+		printf("Fields->imm_I11_0=0x%03x,Fields->rs1=0x%02x,Fields->rd=0x%02x",Fields->imm_I11_0,Fields->rs1,Fields->rd);
+		print_regs();
 		return 1;
 	};
 	uint32_t XORI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
@@ -171,6 +210,11 @@
 		return 1;
 	};
 	uint32_t SLLI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		printf("Fields->rs1=0x%02x,Fields->shamt=0x%02x,Fields->rd=0x%02x",Fields->rs1,Fields->shamt,Fields->rd);
+		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] << Fields->shamt;   
+		printf("Fields->rs1=0x%02x,Fields->shamt=0x%02x,Fields->rd=0x%02x",Fields->rs1,Fields->shamt,Fields->rd);
+		print_regs();
 		return 1;
 	};
 	uint32_t SRLI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
@@ -201,6 +245,11 @@
 		return 1;
 	};
 	uint32_t SLT(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->rd,Fields->rs1,Fields->rs2);
+		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] < RegisterFile[Fields->rs2] ? 1 : 0;        
+		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->rd,Fields->rs1,Fields->rs2);
+		print_regs();
 		return 1;
 	};
 	uint32_t SLTU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
@@ -220,6 +269,12 @@
 		return 1;
 	};
 	uint32_t SRA(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->rd,Fields->rs1,Fields->rs2);
+		int32_t signed_rs1 = static_cast<int32_t>(RegisterFile[Fields->rs1]);
+		RegisterFile[Fields->rd] = signed_rs1 << RegisterFile[Fields->rs2];        
+		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->rd,Fields->rs1,Fields->rs2);
+		print_regs();
 		return 1;
 	};
 	uint32_t OR(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
