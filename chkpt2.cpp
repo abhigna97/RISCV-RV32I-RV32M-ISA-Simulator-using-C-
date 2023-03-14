@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <vector>
+#include <bitset>
 #include <unordered_map>
 #include <bits/stdc++.h>
 #include "declarations.h"
@@ -308,12 +309,15 @@ int main(int argc, char *argv[]) {
         cerr << "Failed to open memory image file." << endl;
         return 0;
     }
-	
-	for (pc ; pc <= (InstrMemory.rbegin() -> first); pc = pc + 4) {
-    uint32_t key = pc;					
-	uint32_t value = InstrMemory[key];	
-    uint32_t opcode = value & 0x3F;
-		switch(opcode){
+	if(pc > (InstrMemory.rbegin() -> first)){
+		cerr <<"PC value is not within mem file range.Please enter a valid PC value in First argument" << endl;
+		return 0;
+	} else {
+		for (pc ; pc <= (InstrMemory.rbegin() -> first); pc = pc + 4) {
+		uint32_t key = pc;					
+		uint32_t value = InstrMemory[key];	
+		uint32_t opcode = value & 0x3F;
+			switch(opcode){
 				case 0b0110111: UtypeDecode(&Fields,value);break;// For LUI
 				case 0b0010111: UtypeDecode(&Fields,value);break;// For AUIPC
 				case 0b1101111: JtypeDecode(&Fields,value);break;// For JAL
@@ -325,9 +329,10 @@ int main(int argc, char *argv[]) {
 				case 0b0110011: RtypeDecode(&Fields,value);break;// For ADD,SLT,SLTU,AND,OR,XOR,SLL,SRL,SUB,SRA
 				case 0b0001111: break; 							 // For FENCE
 				case 0b1110011: ItypeDecode(&Fields,value);break;// For ECALL,EBREAK
-				default : cerr << "Illegal Opcode Detected\n"; return 0; break;
+				default : cerr << "Illegal Opcode Detectedat address(hex): "<< hex << key << "\topcode(binary): " << bitset<7>(opcode) <<"\n"; return 0; break;
+			}
+			//pc = pc + 4;
 		}
-		//pc = pc + 4;
 	}
         
 	
