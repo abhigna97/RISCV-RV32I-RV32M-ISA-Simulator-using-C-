@@ -295,30 +295,41 @@ int main(int argc, char *argv[]) {
         while (getline(memory_file, line)) {
             stringstream ss(line);
             ss >> hex >> address;
+			if(address%4 != 0){
+				cerr << "Wrong Address detected in the Memory Image. Address Can only be a multiple of 4. Stopped at address 0x" << hex << address << endl;
+				return 0;
+			}
             ss.ignore(2, ' '); 												// Ignore the colon and space between address and data
             ss >> hex >> data;
-            Memory[address] = data;
-			uint32_t opcode = data & 0x3F;
-			switch(opcode){
-				case 0b0110111: UtypeDecode(&Fields,data);break;// For LUI
-				case 0b0010111: UtypeDecode(&Fields,data);break;// For AUIPC
-				case 0b1101111: JtypeDecode(&Fields,data);break;// For JAL
-				case 0b1100111: ItypeDecode(&Fields,data);break;// For JALR
-				case 0b1100011: BtypeDecode(&Fields,data);break;// For BEQ,BNE,BLT,BGE,BLTU,BGEU
-				case 0b0000011: ItypeDecode(&Fields,data);break;// For LB,LH,LW,LBU,LHU
-				case 0b0100011: StypeDecode(&Fields,data);break;// For SB,SH,SW
-				case 0b0010011: ItypeDecode(&Fields,data);break;// For ADDI,SLTI,SLTIU,ANDI,ORI,XORI,SLLI,SRLI,SRAI
-				case 0b0110011: RtypeDecode(&Fields,data);break;// For ADD,SLT,SLTU,AND,OR,XOR,SLL,SRL,SUB,SRA
-				case 0b0001111: break; 							// For FENCE
-				case 0b1110011: ItypeDecode(&Fields,data);break;// For ECALL,EBREAK
-				default : break;
-			}
-        }
+            InstrMemory[address] = data;
+		}
         memory_file.close();
     } else {
         cerr << "Failed to open memory image file." << endl;
         return 0;
     }
+	
+	for (pc ; pc <= (InstrMemory.rbegin() -> first); pc = pc + 4) {
+    uint32_t key = pc;					
+	uint32_t value = InstrMemory[key];	
+    uint32_t opcode = value & 0x3F;
+		switch(opcode){
+				case 0b0110111: UtypeDecode(&Fields,value);break;// For LUI
+				case 0b0010111: UtypeDecode(&Fields,value);break;// For AUIPC
+				case 0b1101111: JtypeDecode(&Fields,value);break;// For JAL
+				case 0b1100111: ItypeDecode(&Fields,value);break;// For JALR
+				case 0b1100011: BtypeDecode(&Fields,value);break;// For BEQ,BNE,BLT,BGE,BLTU,BGEU
+				case 0b0000011: ItypeDecode(&Fields,value);break;// For LB,LH,LW,LBU,LHU
+				case 0b0100011: StypeDecode(&Fields,value);break;// For SB,SH,SW
+				case 0b0010011: ItypeDecode(&Fields,value);break;// For ADDI,SLTI,SLTIU,ANDI,ORI,XORI,SLLI,SRLI,SRAI
+				case 0b0110011: RtypeDecode(&Fields,value);break;// For ADD,SLT,SLTU,AND,OR,XOR,SLL,SRL,SUB,SRA
+				case 0b0001111: break; 							 // For FENCE
+				case 0b1110011: ItypeDecode(&Fields,value);break;// For ECALL,EBREAK
+				default : cerr << "Illegal Opcode Detected\n"; return 0; break;
+		}
+		//pc = pc + 4;
+	}
+        
 	
     return EXIT_SUCCESS;
 
