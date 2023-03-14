@@ -110,7 +110,7 @@ void JtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 void RtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t instrtemp;								// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
-	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
+	Fields->opcode 	= instrtemp & 0x0000007F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	instrtemp 		= instrtemp >> 7; 				// shifting instrtemp by 6 positions to get RD
 	Fields->rd 		= instrtemp & 0x0000001F; 		// masking instrtemp with mask value to get value of RD
@@ -133,7 +133,7 @@ void RtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 void ItypeDecode(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t instrtemp; 							// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
-	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
+	Fields->opcode 	= instrtemp & 0x0000007F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	instrtemp 		= instrtemp >> 7; 				// shifting instrtemp by 6 positions to get RD
 	Fields->rd 		= instrtemp & 0x0000001F; 		// masking instrtemp with mask value to get value of RD
@@ -159,7 +159,7 @@ void ItypeDecode(struct InstrFields *Fields, uint32_t instruction){
 void StypeDecode(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t instrtemp,immtemp; 					// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
-	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
+	Fields->opcode 	= instrtemp & 0x0000007F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	instrtemp 		= instrtemp >> 7; 				// shifting instrtemp by 6 positions to get imm[4:0]
 	Fields->imm_S4_0= instrtemp & 0x0000001F; 		// masking instrtemp with mask value to get value of imm[4:0]
@@ -185,7 +185,7 @@ void StypeDecode(struct InstrFields *Fields, uint32_t instruction){
 void BtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t instrtemp,immtemp; 					// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
-	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
+	Fields->opcode 	= instrtemp & 0x0000007F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	instrtemp 		= instrtemp >> 7; 				// shifting instrtemp by 6 positions to get imm[11]
 	Fields->imm_B11 = instrtemp & 0x00000001; 		// masking instrtemp with mask value to get value of imm[11]
@@ -221,7 +221,7 @@ void BtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 void UtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t instrtemp; 					// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
-	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
+	Fields->opcode 	= instrtemp & 0x0000007F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	instrtemp 		= instrtemp >> 7; 				// shifting instrtemp by 6 positions to get RD
 	Fields->rd 		= instrtemp & 0x0000001F; 		// masking instrtemp with mask value to get value of RD
@@ -235,7 +235,7 @@ void UtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 void JtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t instrtemp,immtemp; 					// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
-	Fields->opcode 	= instrtemp & 0x0000003F; 		// masking instrtemp with mask value to get value of Opcode
+	Fields->opcode 	= instrtemp & 0x0000007F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	instrtemp 		= instrtemp >> 7; 				// shifting instrtemp by 6 positions to get RD
 	Fields->rd 		= instrtemp & 0x0000001F; 		// masking instrtemp with mask value to get value of RD
@@ -316,7 +316,7 @@ int main(int argc, char *argv[]) {
 		for (pc ; pc <= (InstrMemory.rbegin() -> first); pc = pc + 4) {
 		uint32_t key = pc;					
 		uint32_t value = InstrMemory[key];	
-		uint32_t opcode = value & 0x3F;
+		uint32_t opcode = value & 0x7F;
 			switch(opcode){
 				case 0b0110111: UtypeDecode(&Fields,value);break;// For LUI
 				case 0b0010111: UtypeDecode(&Fields,value);break;// For AUIPC
@@ -329,7 +329,7 @@ int main(int argc, char *argv[]) {
 				case 0b0110011: RtypeDecode(&Fields,value);break;// For ADD,SLT,SLTU,AND,OR,XOR,SLL,SRL,SUB,SRA
 				case 0b0001111: break; 							 // For FENCE
 				case 0b1110011: ItypeDecode(&Fields,value);break;// For ECALL,EBREAK
-				default : cerr << "Illegal Opcode Detectedat address(hex): "<< hex << key << "\topcode(binary): " << bitset<7>(opcode) <<"\n"; return 0; break;
+				default : cerr << "Illegal Opcode Detectedat address(hex): "<< hex << key << "\tInstruction:"<< setfill('0') << setw(8) << hex << value <<"\topcode(binary): " << bitset<7>(opcode) <<"\n"; return 0; break;
 			}
 			//pc = pc + 4;
 		}
