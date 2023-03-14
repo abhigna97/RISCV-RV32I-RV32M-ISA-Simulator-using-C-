@@ -88,7 +88,7 @@
 		int Immediate_Signed;
 		if(Fields->imm_B12 >>11) Immediate_Signed = static_cast<int>(Fields->imm_B12 | 0xFFFFF000);
 		else Immediate_Signed = static_cast<int>(Fields->imm_B12);
-		if(RegisterFile[Fields->rs1]==RegisterFile[Fields->rs2]) pc+=Immediate_Signed - 4;        
+		if(RegisterFile[Fields->rs1]==RegisterFile[Fields->rs2]) pc+=(Immediate_Signed<<1) - 4;      
 		printf("Fields->imm_B12_1=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x",Fields->imm_B12_1,Fields->rs2,Fields->rs1);
 		print_regs();
 		return 1;
@@ -123,7 +123,7 @@
 	uint32_t BLTU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		print_regs();
 		printf("Fields->imm_B12_1=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x",Fields->imm_B12_1,Fields->rs2,Fields->rs1);
-		if(RegisterFile[Fields->rs1]<RegisterFile[Fields->rs2]) pc+=Fields->imm_B12_1 - 4;        
+		if(RegisterFile[Fields->rs1]<RegisterFile[Fields->rs2])  pc+=((Fields->imm_B12_1)<<1) - 4;       
 		printf("Fields->imm_B12_1=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x",Fields->imm_B12_1,Fields->rs2,Fields->rs1);
 		print_regs();
 		return 1;
