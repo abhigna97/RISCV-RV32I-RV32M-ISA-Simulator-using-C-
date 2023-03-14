@@ -1,6 +1,7 @@
 using namespace std;
 uint32_t pc=0,sp=0,ra=0;												// Modeling Program Counter, Stack Pointer, Return Address
-map <uint32_t, uint32_t> Memory;       									// Modelling the Memory
+map <uint32_t, uint32_t> Memory;       									// Modelling the Data Memory
+map <uint32_t, uint32_t> InstrMemory;       							// Modelling the Inctruction Memory
 
 const char *reg_names[] = {												// Modeling the 32 32-bit GPRs
             "x0/zero", "x1/ra", "x2/sp", "x3/gp", "x4/tp", "x5/t0", "x6/t1", "x7/t2",
