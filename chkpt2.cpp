@@ -120,7 +120,7 @@ void RtypeDecode(struct InstrFields *Fields, uint32_t instruction){
     instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
     instrtemp 		= instrtemp >> 15; 				// shifting instrtemp by 15 positions to get rs1
     Fields->rs1 	= instrtemp & 0x0000001F; 		// masking instrtemp with a mask value to get value of rs1
-    instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
+	instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
     instrtemp 		= instrtemp >> 20; 				// shifting instrtemp by 20 positions to get rs2
     Fields->rs2 	= instrtemp & 0x0000001F; 		// masking instrtemp with a mask value to get value of rs2
     instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
@@ -143,13 +143,13 @@ void ItypeDecode(struct InstrFields *Fields, uint32_t instruction){
     instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
     instrtemp 		= instrtemp >> 15; 				// shifting instrtemp by 15 positions to get rs1
     Fields->rs1 	= instrtemp & 0x0000001F; 		// masking instrtemp with a mask value to get value of rs1
-    instrtemp  	        = instruction; 					// assigning  Instruction again to temporary variable
+	instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
     instrtemp 		= instrtemp >> 20; 				// shifting instrtemp by 20 positions to get shamt/imm[4:0]
     Fields->shamt 	= instrtemp & 0x0000001F; 		// masking instrtemp with a mask value to get value of shamt/imm[4:0]
-    instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
-    // instrtemp        = instrtemp >> 25; 				// shifting instrtemp by 25 positions to get imm[11:5]
-    // Fields->shamt 	= instrtemp & 0x0000007F; 		// masking instrtemp with a mask value to get value of imm[11:5]
-    // instrtemp  	= instruction; 					// assigning  Instruction again to temporary variable
+	instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
+    instrtemp 		= instrtemp >> 25; 				// shifting instrtemp by 25 positions to get imm[11:5]
+    Fields->shamt 	= instrtemp & 0x0000007F; 		// masking instrtemp with a mask value to get value of imm[11:5]
+	instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
     instrtemp 		= instrtemp >> 20; 				// shifting instrtemp by 20 positions to get imm[11:0]
     Fields->imm_I11_0 	= instrtemp & 0x00000FFF; 	// masking instrtemp with a mask value to get value of imm[11:0]
     printf("****I-TYPE:0x%08x****\nimm[11:0]\t=0x%03x\n,rs1\t=0x%02x\n,funct3\t=0x%01x\n,rd\t=0x%02x\n,opcode\t=0x%02x\n",instruction,Fields->imm_I11_0,Fields->rs1,Fields->funct3,Fields->rd,Fields->opcode);
@@ -315,23 +315,28 @@ int main(int argc, char *argv[]) {
 	} else {
 		for (pc ; pc <= (InstrMemory.rbegin() -> first); pc = pc + 4) {
 		uint32_t key = pc;					
-		uint32_t value = InstrMemory[key];	
-		uint32_t opcode = value & 0x7F;
-			switch(opcode){
-				case 0b0110111: UtypeDecode(&Fields,value);break;// For LUI
-				case 0b0010111: UtypeDecode(&Fields,value);break;// For AUIPC
-				case 0b1101111: JtypeDecode(&Fields,value);break;// For JAL
-				case 0b1100111: ItypeDecode(&Fields,value);break;// For JALR
-				case 0b1100011: BtypeDecode(&Fields,value);break;// For BEQ,BNE,BLT,BGE,BLTU,BGEU
-				case 0b0000011: ItypeDecode(&Fields,value);break;// For LB,LH,LW,LBU,LHU
-				case 0b0100011: StypeDecode(&Fields,value);break;// For SB,SH,SW
-				case 0b0010011: ItypeDecode(&Fields,value);break;// For ADDI,SLTI,SLTIU,ANDI,ORI,XORI,SLLI,SRLI,SRAI
-				case 0b0110011: RtypeDecode(&Fields,value);break;// For ADD,SLT,SLTU,AND,OR,XOR,SLL,SRL,SUB,SRA
-				case 0b0001111: break; 							 // For FENCE
-				case 0b1110011: ItypeDecode(&Fields,value);break;// For ECALL,EBREAK
-				default : cerr << "Illegal Opcode Detectedat address(hex): "<< hex << key << "\tInstruction:"<< setfill('0') << setw(8) << hex << value <<"\topcode(binary): " << bitset<7>(opcode) <<"\n"; return 0; break;
+		uint32_t value = InstrMemory[key];
+		if(value == 0){
+			cerr << "***TRAP*** Instruction at address:0x" << hex << key << " is all 0's. Terminating the Simulation" << endl;
+			return 0;
+		} else {
+			uint32_t opcode = value & 0x7F;
+				switch(opcode){
+					case 0b0110111: UtypeDecode(&Fields,value);break;// For LUI
+					case 0b0010111: UtypeDecode(&Fields,value);break;// For AUIPC
+					case 0b1101111: JtypeDecode(&Fields,value);break;// For JAL
+					case 0b1100111: ItypeDecode(&Fields,value);break;// For JALR
+					case 0b1100011: BtypeDecode(&Fields,value);break;// For BEQ,BNE,BLT,BGE,BLTU,BGEU
+					case 0b0000011: ItypeDecode(&Fields,value);break;// For LB,LH,LW,LBU,LHU
+					case 0b0100011: StypeDecode(&Fields,value);break;// For SB,SH,SW
+					case 0b0010011: ItypeDecode(&Fields,value);break;// For ADDI,SLTI,SLTIU,ANDI,ORI,XORI,SLLI,SRLI,SRAI
+					case 0b0110011: RtypeDecode(&Fields,value);break;// For ADD,SLT,SLTU,AND,OR,XOR,SLL,SRL,SUB,SRA
+					case 0b0001111: break; 							 // For FENCE
+					case 0b1110011: ItypeDecode(&Fields,value);break;// For ECALL,EBREAK
+					default : cerr << "Illegal Opcode Detectedat address(hex): "<< hex << key << "\tInstruction:"<< setfill('0') << setw(8) << hex << value <<"\topcode(binary): " << bitset<7>(opcode) <<"\n"; return 0; break;
+				}
+				//pc = pc + 4;
 			}
-			//pc = pc + 4;
 		}
 	}
         
