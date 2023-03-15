@@ -296,10 +296,10 @@
 		return 1;
 	};
 	uint32_t XORI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
-		int32_t signextendimm;
+		int signextendimm;
 		print_regs();
 		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->imm_I11_0=0x%03x\n",Fields->rd,Fields->rs1,Fields->imm_I11_0);
-		signextendimm = int32_t(Fields->imm_I11_0);
+		signextendimm = Fields->imm_I11_0 >>11 == 1 ? (Fields->imm_I11_0) | 0xFFFFF000 : Fields->imm_I11_0;
 		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] ^ signextendimm;        //set_reg(Fields->rd,RegisterFile[Fields->rd]);
 		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,signexteneded imm_I11_0=0x%08x\n",RegisterFile[Fields->rd],RegisterFile[Fields->rs1],signextendimm);
 		print_regs();
