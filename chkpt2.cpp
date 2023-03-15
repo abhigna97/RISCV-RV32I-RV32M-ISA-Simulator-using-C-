@@ -147,9 +147,6 @@ void ItypeDecode(struct InstrFields *Fields, uint32_t instruction){
     instrtemp 		= instrtemp >> 20; 				// shifting instrtemp by 20 positions to get shamt/imm[4:0]
     Fields->shamt 	= instrtemp & 0x0000001F; 		// masking instrtemp with a mask value to get value of shamt/imm[4:0]
 	instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
-    instrtemp 		= instrtemp >> 25; 				// shifting instrtemp by 25 positions to get imm[11:5]
-    Fields->shamt 	= instrtemp & 0x0000007F; 		// masking instrtemp with a mask value to get value of imm[11:5]
-	instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
     instrtemp 		= instrtemp >> 20; 				// shifting instrtemp by 20 positions to get imm[11:0]
     Fields->imm_I11_0 	= instrtemp & 0x00000FFF; 	// masking instrtemp with a mask value to get value of imm[11:0]
     printf("****I-TYPE:0x%08x****\nimm[11:0]\t=0x%03x\n,rs1\t=0x%02x\n,funct3\t=0x%01x\n,rd\t=0x%02x\n,opcode\t=0x%02x\n",instruction,Fields->imm_I11_0,Fields->rs1,Fields->funct3,Fields->rd,Fields->opcode);
