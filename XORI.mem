@@ -1,1 +1,2 @@
-0: AAA3C313
+0: AAA3C313 //x6=x7 ^imm(aaa). prestore value fa50fa50 in x7, therefore equation is fa50fa50 ^ fffffaaa. answer = 5af00fa
+4: 7AA3c313 //same operation but immediate is 000007ff. answer = fa50fdfa
