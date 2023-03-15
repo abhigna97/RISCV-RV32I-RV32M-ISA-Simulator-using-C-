@@ -1,9 +1,9 @@
-0: 717663
+0: 717663 //x2>=x7 pc+=c (3instr)
 4: 717663
 8: 717663
-C: 717663
+C: 717663 //here
 10: 717663
 14: 717663
-18: 1021F663 //branch to location pc+0x108
+18: 1021F663 //x3>=x2 pc+=10c tested for >,<,==,when both are zero [flies off]
 1C: 717663
 20: 717663
