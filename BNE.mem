@@ -1,0 +1,10 @@
+0: 111663 //x1 != x2 jump 3
+4: 111663
+8: 111663
+c: 311663 //x2 != x3 jump 3. OK tested with equal positive and negative values
+10: 111663
+14: 111663
+18: 111663 //resume hear
+1c: 111663
+20: 111663
+24: 80311663 //jumps some where crazy (imm12:1) is 806
