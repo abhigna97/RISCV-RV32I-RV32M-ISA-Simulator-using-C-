@@ -64,7 +64,6 @@
 		printf("RegisterFile[Fields->rd]=0x%08x,extendimm=0x%08x,PC=0x%08x\n",RegisterFile[Fields->rd],extendimm,pc);
 		print_regs();
 		return 1;
-		return 1;
 	};
 	uint32_t JAL(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		int32_t signextendoffset;
