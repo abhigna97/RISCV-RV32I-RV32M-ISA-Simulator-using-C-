@@ -1,0 +1,1 @@
+0: 4131B3 //x3==x2<x4?1:0 switched values for x2 and x4 manually to cover all cases including forcing negative numbers in unsigned fields
