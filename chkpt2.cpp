@@ -11,7 +11,7 @@
 #include "declarations.h"
 #include "functions.h"
 #include "preload.h"
-#define DEBUGMEM				
+#define DEBUG				
 // SILENT  	- 	prints PC and regs at end of all instructions
 // VERBOSE 	- 	prints PC and regs at end of each instruction
 // DEBUG 	- 	prints miscellaneous information
@@ -295,6 +295,7 @@ uint32_t JtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 int main(int argc, char *argv[]) {
  
 	string memoryimage= "program.mem";
+	uint32_t max_pc;
 
     if (argc > 4) {
         cerr << "***CHECK ARGUMENTS*** Incorrect Number of Arguments Provided. Should be Used as follows: \n" << argv[0] << " <pc> <sp> <memoryimage>" << endl;
@@ -339,7 +340,9 @@ int main(int argc, char *argv[]) {
 			Memory[address + 1] = (data >> 8)  & 0xFF;
 			Memory[address + 2] = (data >> 16) & 0xFF;
 			Memory[address + 3] = (data >> 24) & 0xFF;
+			max_pc = address + 4;
 		}
+		printf("max_pc=0x%02x\n",max_pc);
         memory_file.close();
     } else {
         cerr << "***FILE ERROR*** Failed to open memory image file." << endl;
@@ -358,7 +361,7 @@ int main(int argc, char *argv[]) {
 		cerr <<"***WRONG INPUTS*** PC value is not within mem file range.Please enter a valid PC value in the First argument you supply" << endl;
 		return 0;
 	} else {
-		for (pc ; pc <= (Memory.rbegin() -> first); pc = pc + 4) {
+		for (pc ; pc < max_pc; pc = pc + 4) {
 		uint32_t key = pc;					
 		uint32_t value = Memory[key] | (Memory[key + 1] << 8) | (Memory[key + 2] << 16) | (Memory[key + 3] << 24);
 		if(value == 0){
