@@ -4,18 +4,24 @@
     void set_reg(uint32_t regindex, uint32_t regvalue) { RegisterFile[regindex] = regvalue; }	// Getters and setters for general-purpose registers
     uint32_t get_reg(uint32_t regindex) { return RegisterFile[regindex]; }
 
-    void mem_write(uint32_t address, uint32_t data) {											// Memory read operation
-        for (uint32_t i = 0; i < WORD_SIZE; i++) {
-            Memory[address + i] = (data >> (i * 8)) & 0xffffffff;
-        }
+    void mem_write(uint32_t address, uint8_t data) {											// Memory read operation
+        Memory[address] = data;
     }
 	
-    uint32_t mem_read(uint32_t address) {														// Memory write operation
-        uint32_t data = 0;
-        for (uint32_t i = 0; i < WORD_SIZE; i++) {
-            data |= ((uint32_t) Memory[address + i]) << (i * 8);
-        }
+    uint8_t mem_read(uint32_t address) {														// Memory write operation
+        uint8_t data ;
+ 		data = Memory[address];
         return data;
+    }
+	
+	void print_memory() {																		// Function to Print the memory information in a compact format with register names and values
+		for (uint32_t i = 0; i < MEM_SIZE; i++) {
+            printf("%x:\t0x%02x\t", i, Memory[i]);
+            if ((i+1) % 8 == 0) {
+                printf("\n");
+            }
+        }
+        printf("\n");
     }
 	
 	void initialize(){																			// initialize PC and all GPRs with a given value
@@ -25,7 +31,7 @@
 	}
 
     void print_regs() {																			// Function to Print the register information in a compact format with register names and values
-        printf("PC\t:0x%08x\n",pc);
+		printf("PC\t:0x%08x\n",pc);
         for (uint32_t i = 0; i < NUM_REGS; i++) {
             printf("%s\t:0x%08x  ", reg_names[i], RegisterFile[i]);
             if ((i + 1) % 4 == 0) {
@@ -33,20 +39,12 @@
             }
         }
         printf("\n");
-    }
+	}
 	
-	void print_memory() {																		// Function to Print the memory information in a compact format with register names and values
-        for (uint32_t i = 0; i < MEM_SIZE; i=i+4) {
-            printf("%x:\t0x%08x\t", i, Memory[i]);
-            if ((i+4) % 24 == 0) {
-                printf("\n");
-            }
-        }
-        printf("\n");
-    }
+	
 	
 	uint32_t LUI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
-	print_regs();
+		print_regs();
 		printf("Fields->imm_U31_12=0x%05x,Fields->rd=0x%02x\n",Fields->imm_U31_12,Fields->rd);
 		RegisterFile[Fields->rd] = Fields->imm_U31_12 <<12 & 0xfffff000 ;        
 		printf("Fields->imm_U31_12=0x%05x,Fields->rd=0x%02x\n",Fields->imm_U31_12,Fields->rd);
@@ -63,6 +61,7 @@
 		RegisterFile[Fields->rd] = pc + extendimm;      //set_reg(Fields->rd,RegisterFile[Fields->rd]);
 		printf("RegisterFile[Fields->rd]=0x%08x,extendimm=0x%08x,PC=0x%08x\n",RegisterFile[Fields->rd],extendimm,pc);
 		print_regs();
+		return 1;
 		return 1;
 	};
 	uint32_t JAL(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
@@ -104,12 +103,11 @@
 	uint32_t BNE(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		int32_t signextendoffset;
 		print_regs();
-		int signed_rs1,signed_rs2;
-		signed_rs1=static_cast<int>(RegisterFile[Fields->rs1]);
-		signed_rs2=static_cast<int>(RegisterFile[Fields->rs2]);		
 		printf("Fields->imm_B12_1=0x%03x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->imm_B12_1,Fields->rs1,Fields->rs2);
-		signextendoffset = Fields->imm_B12_1 >>11 == 1 ? (Fields->imm_B12_1 <<1 | 0xFFFFE000) : Fields->imm_B12_1 << 1;
-		if(signed_rs1!=signed_rs2) pc+=signextendoffset -4;
+		signextendoffset = int32_t(Fields->imm_B12_1);
+		if(RegisterFile[Fields->rs1] == RegisterFile[Fields->rs2])
+				pc = pc + 4;
+		else	pc = pc + signextendoffset;
 		printf("RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x,PC=0x%08x\n",RegisterFile[Fields->rs1],RegisterFile[Fields->rs2],pc);
 		print_regs();
 		return 1;
@@ -150,16 +148,15 @@
 		int32_t signextendoffset;
 		print_regs();
 		printf("Fields->imm_B12_1=0x%03x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->imm_B12_1,Fields->rs1,Fields->rs2);
-		int signed_rs1,signed_rs2;
-		signed_rs1=static_cast<int>(RegisterFile[Fields->rs1]);
-		signed_rs2=static_cast<int>(RegisterFile[Fields->rs2]);	
-		signextendoffset = Fields->imm_B12_1 >>11 == 1 ? (Fields->imm_B12_1 <<1 | 0xFFFFE000) : Fields->imm_B12_1 << 1;
-		if(signed_rs1 >= signed_rs2) pc+=signextendoffset -4;
+		signextendoffset = int32_t(Fields->imm_B12_1);
+		if(RegisterFile[Fields->rs1] >= RegisterFile[Fields->rs2])
+				pc = pc + signextendoffset;
+		else	pc = pc + 4;
 		printf("RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x,PC=0x%08x\n",RegisterFile[Fields->rs1],RegisterFile[Fields->rs2],pc);
 		print_regs();
 		return 1;
 	};
-	uint32_t LB(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint32_t>& Memory){
+	uint32_t LB(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint8_t>& Memory){
 		print_regs();
 		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->imm=0x%03x\n", Fields->rd, Fields->rs1, Fields->imm_I11_0);
 		uint32_t signedbit;
@@ -179,7 +176,7 @@
 		print_regs();
 		return 1;
 	};
-	uint32_t LH(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint32_t>& Memory){
+	uint32_t LH(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint8_t>& Memory){
 		print_regs();
 		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->imm=0x%03x\n", Fields->rd, Fields->rs1, Fields->imm_I11_0);
 		uint32_t signedbit;
@@ -199,7 +196,7 @@
 		print_regs();
 		return 1;
 	};
-	uint32_t LW(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint32_t>& Memory){
+	uint32_t LW(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint8_t>& Memory){
 		print_regs();
 		printf("Fields->imm_I11_0=0x%03x,Fields->rs1=0x%02x,Fields->rd=0x%02x",Fields->imm_I11_0,Fields->rs1,Fields->rd);
 		int Immediate_Signed;
@@ -210,7 +207,7 @@
 		print_regs();
 		return 1;
 	};
-	uint32_t LBU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint32_t>& Memory){
+	uint32_t LBU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint8_t>& Memory){
 		int32_t signextendimm;
 		uint32_t effaddress;
 		print_regs();
@@ -222,7 +219,7 @@
 		print_regs();
 		return 1;
 	};
-	uint32_t LHU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint32_t>& Memory){
+	uint32_t LHU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint8_t>& Memory){
 	int32_t signextendimm;
 		uint32_t effaddress;
 		print_regs();
@@ -234,7 +231,7 @@
                 print_regs();
 		return 1; 
 	};
-	uint32_t SB(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint32_t>& Memory){
+	uint32_t SB(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint8_t>& Memory){
 	print_regs();
 		int32_t signextendimm;
 		uint32_t effaddress;
@@ -246,7 +243,7 @@
 		print_regs();
 		return 1;
 	};
-	uint32_t SH(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint32_t>& Memory){
+	uint32_t SH(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint8_t>& Memory){
 	print_regs();
 		printf("Fields->imm_S11_0=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x",Fields->imm_S11_0,Fields->rs2,Fields->rs1);
 		int Immediate_Signed;
@@ -257,7 +254,7 @@
 		print_regs();
 		return 1;
 	};
-	uint32_t SW(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint32_t>& Memory){
+	uint32_t SW(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint32_t, uint8_t>& Memory){
 		int32_t signextendimm;
 		uint32_t effaddress;
 		print_regs();
@@ -272,8 +269,11 @@
 	uint32_t ADDI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		print_regs();
 		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->imm=0x%03x\n", Fields->rd, Fields->rs1, Fields->imm_I11_0);
-		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] + Fields->imm_I11_0;
-		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x\n", RegisterFile[Fields->rd], RegisterFile[Fields->rs1]);
+		int32_t leftshiftimm= (Fields->imm_I11_0) << 20;
+		int32_t signed_imm = static_cast<int32_t>(leftshiftimm);
+		int32_t rightshiftimm = signed_imm >> 20;
+		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] + rightshiftimm;
+		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,rightshiftimm=0x%08x\n", RegisterFile[Fields->rd], RegisterFile[Fields->rs1],rightshiftimm);
 		print_regs();
 		return 1;
 	};
@@ -296,10 +296,10 @@
 		return 1;
 	};
 	uint32_t XORI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
-		int signextendimm;
+		int32_t signextendimm;
 		print_regs();
 		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->imm_I11_0=0x%03x\n",Fields->rd,Fields->rs1,Fields->imm_I11_0);
-		signextendimm = Fields->imm_I11_0 >>11 == 1 ? (Fields->imm_I11_0) | 0xFFFFF000 : Fields->imm_I11_0;
+		signextendimm = int32_t(Fields->imm_I11_0);
 		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] ^ signextendimm;        //set_reg(Fields->rd,RegisterFile[Fields->rd]);
 		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,signexteneded imm_I11_0=0x%08x\n",RegisterFile[Fields->rd],RegisterFile[Fields->rs1],signextendimm);
 		print_regs();
@@ -308,8 +308,11 @@
 	uint32_t ORI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		print_regs();
 		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->imm_I11_0=0x%03x\n", Fields->rd, Fields->rs1, Fields->imm_I11_0);
-		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] | Fields->imm_I11_0;
-		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x\n", RegisterFile[Fields->rd], RegisterFile[Fields->rs1]);
+		int32_t leftshiftimm= (Fields->imm_I11_0) << 20;
+		int32_t signed_imm = static_cast<int32_t>(leftshiftimm);
+		int32_t rightshiftimm = signed_imm >> 20;
+		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] | rightshiftimm;
+		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,rightshiftimm=0x%08x\n", RegisterFile[Fields->rd], RegisterFile[Fields->rs1],rightshiftimm);
 		print_regs();
 		return 1;
 	};
@@ -336,28 +339,25 @@
 	uint32_t SRLI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		print_regs();
 		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->shamt=0x%02x\n",Fields->rd,Fields->rs1,Fields->shamt);
-		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] >> Fields->shamt;        //set_reg(Fields->rd,RegisterFile[Fields->rd]);
+		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] << RegisterFile[Fields->shamt];        //set_reg(Fields->rd,RegisterFile[Fields->rd]);
 		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->shamt]=0x%08x\n",RegisterFile[Fields->rd],RegisterFile[Fields->rs1],RegisterFile[Fields->shamt]);
 		print_regs();
 		return 1;
 	};
 	uint32_t SRAI(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		print_regs();
-		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->shamt=0x%02x\n", Fields->rd, Fields->rs1, Fields->imm_I11_0);
-		uint32_t signedbit = RegisterFile[Fields->rs1] & 0x80000000;
-		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] >> Fields->shamt;
-		RegisterFile[Fields->rd] |= signedbit;
-		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x, signedbit=0x%08x\n", RegisterFile[Fields->rd], RegisterFile[Fields->rs1], signedbit);
+		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->shamt=0x%02x\n", Fields->rd, Fields->rs1, Fields->shamt);
+		int32_t signed_rs1 = static_cast<int32_t>(RegisterFile[Fields->rs1]);
+		RegisterFile[Fields->rd] =  signed_rs1 >> Fields->shamt;
+		printf("RegisterFile[Fields->shamt]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rd]=0x%08x, signed_rs1=0x%08x\n", RegisterFile[Fields->shamt], RegisterFile[Fields->rs1],RegisterFile[Fields->rd], signed_rs1);
 		print_regs();
 		return 1;
 	};
 	
 	uint32_t ADD(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		print_regs();
-		int32_t signed_rs1 = static_cast<int32_t>(RegisterFile[Fields->rs1]);
-		int32_t signed_rs2 = static_cast<int32_t>(RegisterFile[Fields->rs2]);
 		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->rd,Fields->rs1,Fields->rs2);
-		RegisterFile[Fields->rd] = signed_rs1 + signed_rs2;        //set_reg(Fields->rd,RegisterFile[Fields->rd]);
+		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] + RegisterFile[Fields->rs2];        //set_reg(Fields->rd,RegisterFile[Fields->rd]);
 		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x\n",RegisterFile[Fields->rd],RegisterFile[Fields->rs1],RegisterFile[Fields->rs2]);
 		print_regs();
 		return 1;
@@ -366,8 +366,8 @@
 	uint32_t SUB(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		print_regs();
 		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n", Fields->rd, Fields->rs1, Fields->rs2);
-		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] - RegisterFile[Fields->rs2];        //set_reg(Fields->rd,RegisterFile[Fields->rd]);
-		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x\n", RegisterFile[Fields->rd], RegisterFile[Fields->rs1], RegisterFile[Fields->rs2]);
+		RegisterFile[Fields->rd] = static_cast<int32_t>(RegisterFile[Fields->rs1]) - static_cast<int32_t>(RegisterFile[Fields->rs2]); 
+		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x\n", RegisterFile[Fields->rd],RegisterFile[Fields->rs1], RegisterFile[Fields->rs2]);
 		print_regs();
 		return 1;
 	};
