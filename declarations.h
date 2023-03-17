@@ -1,23 +1,22 @@
 using namespace std;
-uint32_t pc=0,sp=0,ra=0;												// Modeling Program Counter, Stack Pointer, Return Address
-map <uint32_t, uint32_t> Memory;       									// Modelling the Data Memory
-map <uint32_t, uint32_t> InstrMemory;       							// Modelling the Inctruction Memory
+uint32_t pc=0,sp=0/*65535*/,ra=0;												// Modeling Program Counter(0), Stack Pointer(65535), Return Address(0)
+map <uint32_t, uint8_t> Memory;       									// Modelling the Data Memory
 
 const char *reg_names[] = {												// Modeling the 32 32-bit GPRs
             "x0/zero", "x1/ra", "x2/sp", "x3/gp", "x4/tp", "x5/t0", "x6/t1", "x7/t2",
             "x8/s0", "x9/s1", "x10/a0", "x11/a1", "x12/a2", "x13/a3", "x14/a4", "x15/a5",
             "x16/a6", "x17/a7", "x18/s2", "x19/s3", "x20/s4", "x21/s5", "x22/s6", "x23/s7",
             "x24/s8", "x25/s9", "x26/s10", "x27/s11", "x28/t3", "x29/t4", "x30/t5", "x31/t6"};
-
-const uint32_t MEM_SIZE  = 65536;  										// Size of Memory = 64 KB
+			
+const uint32_t MEM_SIZE  = 65536;				  						// Size of Memory Restricted to 64 KB 
 const uint32_t WORD_SIZE = 8;    										// SIze of Word = 8 bytes
 const uint32_t NUM_REGS  = sizeof(reg_names) / sizeof(reg_names[0]);	// Calculate the number of registers: 32 in RISC-V
 
 map<uint32_t, uint32_t> RegisterFile{									// Modeling the 32 RISCV General Purpose Registers
-	{0, 0}, {1, ra}, {2, sp}, {3, 0}, {4, 45}, {5, 0}, {6, 55}, {7, 0},
-    {8, 128}, {9, 0}, {10, 0}, {11, 0}, {12, 0}, {13, 0}, {14, 0}, {15, 0},
-    {16, 150}, {17, 0}, {18, 0}, {19, 0}, {20, 0}, {21, 0}, {22, 89}, {23, 0},
-    {24, 0}, {25, 0}, {26, 0}, {27, 0}, {28, 153}, {29, 0}, {30, 0}, {31, 0}
+	{0, 0}, {1, ra}, {2, sp}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0},
+    {8, 0}, {9, 0}, {10, 0}, {11, 0}, {12, 0}, {13, 0}, {14, 0}, {15, 0},
+    {16, 0}, {17, 0}, {18, 0}, {19, 0}, {20, 0}, {21, 0}, {22, 0}, {23, 0},
+    {24, 0}, {25, 0}, {26, 0}, {27, 0}, {28, 0}, {29, 0}, {30, 0}, {31, 0}
 };
 struct InstrFields{					//Struct type for Instruction that holds different part of the Instruction
     unsigned int opcode;         	//opcode
