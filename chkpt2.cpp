@@ -11,7 +11,7 @@
 #include "declarations.h"
 #include "functions.h"
 #include "preload.h"
-#define DEBUG				
+#define DEBUGMEM				
 // SILENT  	- 	prints PC and regs at end of all instructions
 // VERBOSE 	- 	prints PC and regs at end of each instruction
 // DEBUG 	- 	prints miscellaneous information
@@ -342,7 +342,9 @@ int main(int argc, char *argv[]) {
 			Memory[address + 3] = (data >> 24) & 0xFF;
 			max_pc = address + 4;
 		}
-		printf("max_pc=0x%02x\n",max_pc);
+		#ifdef DEBUG
+			printf("max_pc=0x%08x\n",max_pc);
+		#endif	
         memory_file.close();
     } else {
         cerr << "***FILE ERROR*** Failed to open memory image file." << endl;
