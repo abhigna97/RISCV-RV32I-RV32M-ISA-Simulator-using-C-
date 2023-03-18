@@ -229,10 +229,10 @@
 		else Immediate_Signed = static_cast<int>(Fields->imm_I11_0);
 		effectiveaddress = Immediate_Signed + RegisterFile[Fields->rs1];
 		if(effectiveaddress % 4 == 0) printf("Unaligned Memory Reference! Address: %08x \n",effectiveaddress);
-		print_memory(effectiveaddress);
+		//print_memory(effectiveaddress);
 		RegisterFile[Fields->rd] = Memory[effectiveaddress] | (Memory[effectiveaddress + 1] << 8) | (Memory[effectiveaddress + 2] <<16) | (Memory[effectiveaddress + 3] << 24);
 		printf("Fields->imm_B12_1=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x, Immediate_Signed=0x%08x, Memory[%08x]=0x%08x \n",Fields->imm_B12_1,Fields->rs2,Fields->rs1, Immediate_Signed, effectiveaddress, Memory[effectiveaddress]);
-		print_memory(effectiveaddress);
+		//print_memory(effectiveaddress);
 		print_regs();
 		return 1;
 	};
@@ -292,10 +292,10 @@
 		else Immediate_Signed = static_cast<int>(Fields->imm_S11_0);
 		effectiveaddress = RegisterFile[Fields->rs1] + Immediate_Signed;
 		// if(effectiveaddress % 2 == 0) printf("Unaligned Memory Reference! Address: %08x \n", effectiveaddress); 
-		print_memory(effectiveaddress);
+		//print_memory(effectiveaddress);
 		Memory[effectiveaddress] = RegisterFile[Fields->rs2] & 0x00000FF;
 		Memory[effectiveaddress+1] = (RegisterFile[Fields->rs2] >>8) & 0x000000FF;
-		print_memory(effectiveaddress);
+		//print_memory(effectiveaddress);
 		printf("Fields->imm_S11_0=0x%03x, Fields->rs2=0x%02x, Fields->rs1=0x%02x, Memory[%08x]=%08x \n",Fields->imm_S11_0,Fields->rs2,Fields->rs1, effectiveaddress, Memory[effectiveaddress]);
 		print_regs();
 		return 1;
