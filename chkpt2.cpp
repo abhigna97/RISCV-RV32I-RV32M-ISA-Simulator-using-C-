@@ -8,14 +8,17 @@
 #include <bitset>
 #include <unordered_map>
 #include <bits/stdc++.h>
-#include "declarations.h"
-#include "functions.h"
-#include "preload.h"
+#include "declarations.h"		// Contains Memory, Constants and Instruction Fields Struct Declarations
+#include "functions.h"			// Contains Definition of PC/Memory/Register Read/Write functions, RV32I Functions.
+#include "preload.h"			// File to Preload the registers and memory locations for Function Specific testing
 #define DEBUGMEM				
 // SILENT  	- 	prints PC and regs at end of all instructions
 // VERBOSE 	- 	prints PC and regs at end of each instruction
 // DEBUG 	- 	prints miscellaneous information
 // DEBUGMEM - 	Prints Memory Contents
+
+/***************************************** EXECUTE FUNCTIONS SPECIFIC TO INSTRUCTION TYPE *****************************************/
+
 uint32_t RtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t funct3temp,funct7temp;
 	funct3temp = Fields->funct3;
@@ -117,6 +120,8 @@ uint32_t JtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	JAL(Fields,RegisterFile);
 	return 1;
 }
+
+/***************************************** DECODE FUNCTIONS SPECIFIC TO INSTRUCTION TYPE *****************************************/
 
 uint32_t RtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t instrtemp;								// temporary variable to store the Instruction from file
@@ -242,7 +247,7 @@ uint32_t BtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 }
 
 uint32_t UtypeDecode(struct InstrFields *Fields, uint32_t instruction){
-	uint32_t instrtemp; 					// temporary variable to store the Instruction from file
+	uint32_t instrtemp; 							// temporary variable to store the Instruction from file
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
 	Fields->opcode 	= instrtemp & 0x0000007F; 		// masking instrtemp with mask value to get value of Opcode
 	instrtemp 		= instruction;  				// assigning the temporary variable with the Instruction
@@ -250,7 +255,7 @@ uint32_t UtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 	Fields->rd 		= instrtemp & 0x0000001F; 		// masking instrtemp with mask value to get value of RD
 	instrtemp  		= instruction; 					// assigning  Instruction again to temporary variable
     instrtemp		= instrtemp >> 12; 				// shifting instrtemp by 12 positions to get imm[31:12]
-    Fields->imm_U31_12 	= instrtemp & 0x000FFFFF; 		// masking instrtemp with a mask value to get value of imm[31:12]
+    Fields->imm_U31_12 	= instrtemp & 0x000FFFFF; 	// masking instrtemp with a mask value to get value of imm[31:12]
 	#ifdef DEBUG
 		printf("***U-TYPE:0x%08x****\nimm[31:12]\t=0x%05x\n,rd\t=0x%02x\n,opcode\t=0x%02x\n",instruction,Fields->imm_U31_12,Fields->rd,Fields->opcode);
 	#endif
@@ -291,6 +296,7 @@ uint32_t JtypeDecode(struct InstrFields *Fields, uint32_t instruction){
 	else return 0;
 }
 
+/***************************************** MAIN FUNCTION FOR RISCV SIMULATOR *****************************************/
 
 int main(int argc, char *argv[]) {
  
@@ -300,8 +306,8 @@ int main(int argc, char *argv[]) {
     if (argc > 4) {
         cerr << "***CHECK ARGUMENTS*** Incorrect Number of Arguments Provided. Should be Used as follows: \n" << argv[0] << " <pc> <sp> <memoryimage>" << endl;
         return EXIT_FAILURE;
-    } else {
-		if(argc>1){								// Parse PC and SP as 32-bit hexadecimal values, and Memory Image File as a String
+    } else {																// Parse PC and SP as 32-bit hexadecimal values, and Memory Image File as a String
+		if(argc>1){								
 			stringstream ss_pc(argv[1]);
 			ss_pc >> hex >> pc;
 		}
@@ -314,11 +320,13 @@ int main(int argc, char *argv[]) {
 			memoryimage = string(argv[3]);
 		}	
 	}
+	
 	#ifdef DEBUG
-    cout << "PC = 0x" << setfill('0') << setw(8) << hex << pc << endl;		// printing the parsed arguments
+    cout << "PC = 0x" << setfill('0') << setw(8) << hex << pc << endl;		// printing the parsed arguments in DEBUG Mode
     cout << "SP = 0x" << setfill('0') << setw(8) << hex << sp << endl;
     cout << "Memory image filename = " << memoryimage << endl;
 	#endif
+	
 	ifstream memory_file(memoryimage);										// Loading the Memory Image into Memory Map
 	uint32_t address,data;
 	if (memory_file.is_open()) {
@@ -350,45 +358,46 @@ int main(int argc, char *argv[]) {
         cerr << "***FILE ERROR*** Failed to open memory image file." << endl;
         return 0;
     }
-	//SUBPreload();
-	//XORPreload();
-	//SRAIPreload();
-	//ORIPreload();
-	//ADDIPreload();
-	LHUPreload();
-	//LBPreload();
-	//BLTPreload();
-	//JALPreload();
+	
+	#ifdef DEBUGMEM																	// To preload Memory/Registers for Debug Purposes
+		PREload();
+	#endif
+	
 	if(pc > (Memory.rbegin() -> first)){
 		cerr <<"***WRONG INPUTS*** PC value is not within mem file range.Please enter a valid PC value in the First argument you supply" << endl;
 		return 0;
 	} else {
 		for (pc ; pc < max_pc; pc = pc + 4) {
-		uint32_t key = pc;					
-		uint32_t value = Memory[key] | (Memory[key + 1] << 8) | (Memory[key + 2] << 16) | (Memory[key + 3] << 24);
-		if(value == 0){
-			cerr << "***TRAP*** Instruction at address:0x" << hex << key << " is all 0's. Terminating the Simulation" << endl;
-			return 0;
-		} else {
-			uint32_t opcode = value & 0x7F;
-				switch(opcode){
-					case 0b0110111: if(!UtypeDecode(&Fields,value)) return 1;	break;	// For LUI
-					case 0b0010111: if(!UtypeDecode(&Fields,value)) return 1;	break;	// For AUIPC
-					case 0b1101111: if(!JtypeDecode(&Fields,value)) return 1;	break;	// For JAL
-					case 0b1100111: if(!ItypeDecode(&Fields,value)) return 1;	break;	// For JALR
-					case 0b1100011: if(!BtypeDecode(&Fields,value)) return 1;	break;	// For BEQ,BNE,BLT,BGE,BLTU,BGEU
-					case 0b0000011: if(!ItypeDecode(&Fields,value)) return 1;	break;	// For LB,LH,LW,LBU,LHU
-					case 0b0100011: if(!StypeDecode(&Fields,value)) return 1;	break;	// For SB,SH,SW
-					case 0b0010011: if(!ItypeDecode(&Fields,value)) return 1;	break;	// For ADDI,SLTI,SLTIU,ANDI,ORI,XORI,SLLI,SRLI,SRAI
-					case 0b0110011: if(!RtypeDecode(&Fields,value)) return 1;	break;	// For ADD,SLT,SLTU,AND,OR,XOR,SLL,SRL,SUB,SRA
-					case 0b0001111: break; 							 	// For FENCE
-					case 0b1110011: ItypeDecode(&Fields,value);	break;	// For ECALL,EBREAK
-					default : 		cerr << "***ILLEGAL OPCODE*** Detected at address(hex): "<< hex << key << "\tInstruction:"<< setfill('0') << setw(8) << hex << value <<"\topcode(binary): " << bitset<7>(opcode) <<"\n"; 
-									return 0; break;
+			uint32_t key = pc;	
+			if(key % 4 == 0) {
+				uint32_t value = Memory[key] | (Memory[key + 1] << 8) | (Memory[key + 2] << 16) | (Memory[key + 3] << 24);
+				if(value == 0){
+					cerr << "***TRAP*** Instruction at address:0x" << hex << key << " is all 0's. Terminating the Simulation" << endl;
+					return 0;
+				} else {
+					uint32_t opcode = value & 0x7F;
+						switch(opcode){
+							case 0b0110111: if(!UtypeDecode(&Fields,value)) return 0;	break;	// For LUI
+							case 0b0010111: if(!UtypeDecode(&Fields,value)) return 0;	break;	// For AUIPC
+							case 0b1101111: if(!JtypeDecode(&Fields,value)) return 0;	break;	// For JAL
+							case 0b1100111: if(!ItypeDecode(&Fields,value)) return 0;	break;	// For JALR
+							case 0b1100011: if(!BtypeDecode(&Fields,value)) return 0;	break;	// For BEQ,BNE,BLT,BGE,BLTU,BGEU
+							case 0b0000011: if(!ItypeDecode(&Fields,value)) return 0;	break;	// For LB,LH,LW,LBU,LHU
+							case 0b0100011: if(!StypeDecode(&Fields,value)) return 0;	break;	// For SB,SH,SW
+							case 0b0010011: if(!ItypeDecode(&Fields,value)) return 0;	break;	// For ADDI,SLTI,SLTIU,ANDI,ORI,XORI,SLLI,SRLI,SRAI
+							case 0b0110011: if(!RtypeDecode(&Fields,value)) return 0;	break;	// For ADD,SLT,SLTU,AND,OR,XOR,SLL,SRL,SUB,SRA
+							case 0b0001111: break; 							 					// For FENCE
+							case 0b1110011: if(!ItypeDecode(&Fields,value)) return 0;	break;	// For ECALL,EBREAK
+							default : 		cerr << "***ILLEGAL OPCODE*** Detected at address(hex): "<< hex << key << "\tInstruction:"<< setfill('0') << setw(8) << hex << value <<"\topcode(binary): " << bitset<7>(opcode) <<"\n"; 
+											return 0; break;
+						}
+						#ifdef VERBOSE 
+							print_regs();
+						#endif
 				}
-				#ifdef VERBOSE 
-					print_regs();
-				#endif
+			} else {
+				cerr << "***TRAP*** Unaligned Instruction Fetch at PC(Hex) :0x" << pc << endl;
+					return 0;
 			}
 		}
 	}
@@ -398,9 +407,7 @@ int main(int argc, char *argv[]) {
 	#ifdef DEBUGMEM
     print_memory();
 	#endif
-	
     return EXIT_SUCCESS;
-
+	
 }
-
-// commands to use: g++ -o chk2 chkpt2.cpp ; ./chk2 98 76 file1.mem
+// commands to use: g++ -o chk2 chkpt2.cpp ; ./chk2 PC SP MEMFILE
