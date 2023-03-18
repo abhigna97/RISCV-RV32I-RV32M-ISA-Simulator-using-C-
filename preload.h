@@ -13,18 +13,13 @@ void SUBPreload(){
 	set_reg(5,0xFFFFFFC6); //-58
 	set_reg(3,24);
 	set_reg(21,0xFFFFFF9F); //-97
-	//set_reg(2,45);
-	//set_reg(4,);
 	set_reg(19,0xFFFFFFD3); //-45
-	//set_reg(4,);
-	//set_reg(6,);
 	set_reg(11,0xFFFFFF59); //-167
 	set_reg(25,0xFFFFFFD6); //-42
-	//set_reg(11,);
 	set_reg(15,0xFFFFFFBD); // -67
 	set_reg(20,0xFFFFFCEF); // -785
-	//set_reg(20,);
 };
+
 void XORPreload(){
 	set_reg(4,0xAAAAAAAA);
 	set_reg(6,0x55555555);
@@ -39,18 +34,13 @@ void XORPreload(){
 	set_reg(5,0xFFFF0000);
 	set_reg(3,0x8724);
 	set_reg(21,0xDFDFDFDF);
-	//set_reg(2,45);
-	//set_reg(4,);
 	set_reg(19,0xCCCCCCCC);
-	//set_reg(4,);
-	//set_reg(6,);
 	set_reg(11,0xEFBCDA89);
 	set_reg(25,0xF123456);
-	//set_reg(11,);
 	set_reg(15,0xABCDDCBA);
 	set_reg(20,0x12344321);
-	//set_reg(20,);
 };
+
 void SRAIPreload(){
 	set_reg(4,0xAAAAAAAA);
 	set_reg(6,0x55555555);
@@ -65,18 +55,13 @@ void SRAIPreload(){
 	set_reg(5,0xFFFF0000);
 	set_reg(3,0x8724);
 	set_reg(21,0xDFDFDFDF);
-	//set_reg(2,45);
-	//set_reg(4,);
 	set_reg(19,0xCCCCCCCC);
-	//set_reg(4,);
-	//set_reg(6,);
 	set_reg(11,0xEFBCDA89);
 	set_reg(25,0xF123456);
-	//set_reg(11,);
 	set_reg(15,0xABCDDCBA);
 	set_reg(20,0x12344321);
-	//set_reg(20,);
 };
+
 void ORIPreload(){
 	set_reg(4,0xAAAAAAAA);
 	set_reg(6,0x55555555);
@@ -91,18 +76,13 @@ void ORIPreload(){
 	set_reg(5,0xFFFF0000);
 	set_reg(3,0x8724);
 	set_reg(21,0xDFDFDFDF);
-	//set_reg(2,45);
-	//set_reg(4,);
 	set_reg(19,0xCCCCCCCC);
-	//set_reg(4,);
-	//set_reg(6,);
 	set_reg(11,0xEFBCDA89);
 	set_reg(25,0xF123456);
-	//set_reg(11,);
 	set_reg(15,0xABCDDCBA);
 	set_reg(20,0x12344321);
-	//set_reg(20,);
 };
+
 void ADDIPreload(){
 	set_reg(4,0xAAAAAAAA);
 	set_reg(6,0x55555555);
@@ -117,19 +97,14 @@ void ADDIPreload(){
 	set_reg(5,0xFFFF0000);
 	set_reg(3,0x8724);
 	set_reg(21,0xDFDFDFDF);
-	//set_reg(2,45);
-	//set_reg(4,);
 	set_reg(19,0xCCCCCCCC);
-	//set_reg(4,);
-	//set_reg(6,);
 	set_reg(11,0xEFBCDA89);
 	set_reg(25,0xF123456);
-	//set_reg(11,);
 	set_reg(15,0xABCDDCBA);
 	set_reg(20,0x12344321);
-	//set_reg(20,);
 	set_reg(31,0xFFFFFFFF);
 };
+
 void LHUPreload(){
 	set_reg(4,0xAAAAAAAA);
 	set_reg(6,0x00000055);
@@ -138,16 +113,11 @@ void LHUPreload(){
 	mem_write(0x5AB,0xFB);
 	mem_write(0x5AC,0x67);
 	mem_write(0x5AD,0x90);
-	//print_memory();
 	set_reg(12,0xABCDEF12);
 	set_reg(8,0xFFFFFFFF);
 	set_reg(7,0x0000FFFF);
 	mem_write(0xFFFE,0x23);
 	mem_write(0xFFFF,0x54);
-	//mem_write(0x0000,0xFB);
-	//mem_write(0x0001,0x67);
-	//mem_write(0x0002,0x90);
-	
 	set_reg(14,0x811);
 	set_reg(2,0x80000000);
 	mem_write(0xFFE0,0x87);
@@ -158,17 +128,11 @@ void LHUPreload(){
 	set_reg(5,0xFFFF0000);
 	set_reg(3,0x8724);
 	set_reg(21,0xDFDFDFDF);
-	//set_reg(2,45);
-	//set_reg(4,);
 	set_reg(19,0xCCCCCCCC);
-	//set_reg(4,);
-	//set_reg(6,);
 	set_reg(11,0xEFBCDA89);
 	set_reg(25,0xF123456);
-	//set_reg(11,);
 	set_reg(15,0xABCDDCBA);
 	set_reg(20,0x12344321);
-	//set_reg(20,);
 	set_reg(31,0xFFFFFFFF);
 };
 
@@ -180,16 +144,11 @@ void LBPreload(){
 	mem_write(0x5AB,0xFB);
 	mem_write(0x5AC,0x67);
 	mem_write(0x5AD,0x90);
-	//print_memory();
 	set_reg(12,0xABCDEF12);
 	set_reg(8,0xFFFFFFFF);
 	set_reg(7,0x0000FFFF);
 	mem_write(0xFFFE,0x23);
 	mem_write(0xFFFF,0x54);
-	//mem_write(0x0000,0xFB);
-	//mem_write(0x0001,0x67);
-	//mem_write(0x0002,0x90);
-	
 	set_reg(14,0x811);
 	set_reg(2,0x80000000);
 	mem_write(0xFFE0,0x87);
@@ -200,26 +159,21 @@ void LBPreload(){
 	set_reg(5,0xFFFF0000);
 	set_reg(3,0x8724);
 	set_reg(21,0xDFDFDFDF);
-	//set_reg(2,45);
-	//set_reg(4,);
 	set_reg(19,0xCCCCCCCC);
-	//set_reg(4,);
-	//set_reg(6,);
 	set_reg(11,0xEFBCDA89);
 	set_reg(25,0xF123456);
-	//set_reg(11,);
 	set_reg(15,0xABCDDCBA);
 	set_reg(20,0x12344321);
-	//set_reg(20,);
 	set_reg(31,0xFFFFFFFF);
 };
 
 void BLTPreload(){
-	set_reg(21,0x00000055);
-	set_reg(6,0x000005AA);
+	set_reg(6,0x00000055);
+	set_reg(21,0x000005AA);
 	set_reg(2,0x0000FFFF);
 	set_reg(7,0x0000FFFF);
 	set_reg(4,0xFFFFFF00);
+	set_reg(17,0xFFFFFE00);
 	set_reg(31,0xFFFF0000);
 	set_reg(5,0xFFFF00FF);
 	set_reg(30,0x80000000);
@@ -242,16 +196,11 @@ void JALPreload(){
 	mem_write(0x5AB,0xFB);
 	mem_write(0x5AC,0x67);
 	mem_write(0x5AD,0x90);
-	//print_memory();
 	set_reg(12,0xABCDEF12);
 	set_reg(8,0xFFFFFFFF);
 	set_reg(7,0x0000FFFF);
 	mem_write(0xFFFE,0x23);
 	mem_write(0xFFFF,0x54);
-	//mem_write(0x0000,0xFB);
-	//mem_write(0x0001,0x67);
-	//mem_write(0x0002,0x90);
-	
 	set_reg(14,0x811);
 	set_reg(2,0x80000000);
 	mem_write(0xFFE0,0x87);
@@ -262,17 +211,11 @@ void JALPreload(){
 	set_reg(5,0xFFFF0000);
 	set_reg(3,0x8724);
 	set_reg(21,0xDFDFDFDF);
-	//set_reg(2,45);
-	//set_reg(4,);
 	set_reg(19,0xCCCCCCCC);
-	//set_reg(4,);
-	//set_reg(6,);
 	set_reg(11,0xEFBCDA89);
 	set_reg(25,0xF123456);
-	//set_reg(11,);
 	set_reg(15,0xABCDDCBA);
 	set_reg(20,0x12344321);
-	//set_reg(20,);
 	set_reg(31,0xFFFFFFFF);
 };
 
@@ -284,6 +227,6 @@ void PREload(){
 	//ADDIPreload();
 	//LHUPreload();
 	//LBPreload();
-	BLTPreload();
+	//BLTPreload();
 	//JALPreload();
 }
