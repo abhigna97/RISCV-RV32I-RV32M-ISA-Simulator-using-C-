@@ -174,9 +174,9 @@
 		int signedanswer;
 		print_regs();
 		printf("Fields->imm_B12_1=0x%03x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->imm_B12_1,Fields->rs1,Fields->rs2);
-		int signed_rs1,signed_rs2;
-		signed_rs1=static_cast<int>(RegisterFile[Fields->rs1]);
-		signed_rs2=static_cast<int>(RegisterFile[Fields->rs2]);	
+		uint32_t signed_rs1,signed_rs2;
+		signed_rs1=RegisterFile[Fields->rs1];
+		signed_rs2=RegisterFile[Fields->rs2];	
 		signextendoffset = Fields->imm_B12_1 >>11 == 1 ? (Fields->imm_B12_1 <<1 | 0xFFFFE000) : Fields->imm_B12_1 << 1;
 		signedanswer=static_cast<int>(signextendoffset);
 		if(signed_rs1 >= signed_rs2) pc+=signedanswer -4;
