@@ -74,6 +74,7 @@ uint32_t ItypeExecute(struct InstrFields *Fields, uint32_t instruction){
 						case 0b111: ANDI(Fields,RegisterFile); 	break;
 						default : cerr << "***ILLEGAL Funct3*** Supplied to I-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
 					} break;
+	case 0b1100111: JALR(Fields,RegisterFile);	break;
 	default : cerr << "***ILLEGAL Opcode*** Supplied to I-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
 	}
 	return 1;
@@ -360,7 +361,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 	
-	#ifdef DEBUGMEM																	// To preload Memory/Registers for Debug Purposes
+	#ifdef DEBUG																	// To preload Memory/Registers for Debug Purposes
 		PREload();
 	#endif
 	
