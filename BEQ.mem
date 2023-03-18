@@ -1,0 +1,21 @@
+  8:  00418463
+  C:  00418263
+ 10:  00418663
+
+
+/* Below multi-line commented code may cause problems.
+  8:  00418463  // imm=8(after appending LSB)
+  C:  00418463  // imm=8(after appending LSB)
+ 10:  00418463  // imm=8(after appending LSB)
+After executing the instruction at 0x8, it terminates printing: All 0's instruction detected.
+
+   8:  00418463
+  10:  00418463
+  18:  00418663
+// The above addresses lead to a sequence of branches.
+
+  8:  00418463   // imm=8 (after appending LSB)
+  C:  00418263   // imm=4 (after appending LSB)
+ 10:  00418663   // imm=c (after appending LSB)
+*/
+

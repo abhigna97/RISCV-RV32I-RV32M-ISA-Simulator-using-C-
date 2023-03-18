@@ -1,12 +1,1 @@
-/*
-SLT Test Cases:- Tested the Following Scenarios:
-1. Set rs1 = all 1's, rs2 = all 1's.
-2. Set rs1 = bigger number, rs2 = smaller number (Signed Number)
-3. Set rs1 = bigger number, rs2 = smaller number (Unsigned Number)
-4. Set rs1 = smaller number, rs2 = bigger number (Signed Number)
-5. Set rs1 = smaller number, rs2 = bigger number (Unsigned Number)
-6. Set rs1 = rs2 (Signed Number)
-7. Set rs1 = rs2 (Unsigned Number)
-8. Set rs1 = all 0's, rs2 = all 0's
-*/
-   4:  0041A2B3
+   0:  0041A2B3             // rs1 = 3, rs2 = 4, rd = 5;

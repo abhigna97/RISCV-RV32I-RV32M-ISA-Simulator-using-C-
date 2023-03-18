@@ -1,0 +1,4 @@
+// rs1 = 3, rd = 5
+   0:  0001B293             // rs1 = -1, imm = 0
+   4:  FED1B293             // rs1 = +79, imm = -19
+   8:  FFF1B293             // rs1 = all 1's, imm = all 1's, Result=0
