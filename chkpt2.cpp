@@ -11,7 +11,7 @@
 #include "declarations.h"		// Contains Memory, Constants and Instruction Fields Struct Declarations
 #include "functions.h"			// Contains Definition of PC/Memory/Register Read/Write functions, RV32I Functions.
 #include "preload.h"			// File to Preload the registers and memory locations for Function Specific testing
-#define DEBUGMEM				
+#define DEBUG				
 // SILENT  	- 	prints PC and regs at end of all instructions
 // VERBOSE 	- 	prints PC and regs at end of each instruction
 // DEBUG 	- 	prints miscellaneous information
@@ -81,6 +81,7 @@ uint32_t ItypeExecute(struct InstrFields *Fields, uint32_t instruction){
 
 uint32_t StypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t funct3temp;
+	funct3temp = Fields->funct3;
 	switch(funct3temp){
 				case 0b000: SB(Fields,RegisterFile,Memory); 	break;		
 				case 0b001: SH(Fields,RegisterFile,Memory); 	break;
@@ -396,7 +397,7 @@ int main(int argc, char *argv[]) {
 						#endif
 				}
 			} else {
-				cerr << "***TRAP*** Unaligned Instruction Fetch at PC(Hex) :0x" << pc << endl;
+				cerr << "***TRAP*** MISALIGNED INSTRUCTION ADDRESS is fetched at PC(Hex) :0x" << hex << pc << endl;
 					return 0;
 			}
 		}
