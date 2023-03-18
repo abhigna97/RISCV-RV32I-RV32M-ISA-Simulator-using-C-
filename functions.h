@@ -54,11 +54,13 @@
 	uint32_t AUIPC(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		uint32_t extendimm;
 		uint32_t effaddress;
+		int signedanswer;
 		print_regs();
 		printf("Fields->imm_S11_0=0x%03x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->imm_S11_0,Fields->rs1,Fields->rs2);
 		extendimm = (Fields->imm_U31_12)<<12;
 		extendimm = extendimm & 0xFFFFF000;
-		RegisterFile[Fields->rd] = pc + extendimm;      
+		signedanswer = static_cast<int>(extendimm);
+		RegisterFile[Fields->rd] = pc + signedanswer;      
 		printf("RegisterFile[Fields->rd]=0x%08x,extendimm=0x%08x,PC=0x%08x\n",RegisterFile[Fields->rd],extendimm,pc);
 		print_regs();
 		return 1;
