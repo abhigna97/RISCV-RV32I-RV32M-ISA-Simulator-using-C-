@@ -545,9 +545,32 @@
 		return 1;
 	};
 	uint32_t MULHSU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		uint64_t unsigned_rs1 = static_cast<uint64_t>(RegisterFile[Fields->rs1]);
+		uint64_t unsigned_rs2 = static_cast<uint64_t>(RegisterFile[Fields->rs2]);
+		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->rd,Fields->rs1,Fields->rs2);
+		uint64_t mult64 = unsigned_rs1 * unsigned_rs2; 
+		cout << "value of mult64:" << mult64 << endl;
+		uint64_t mult64rsh = (mult64 >> 32);
+		RegisterFile[Fields->rd]   =  static_cast<uint32_t>(mult64rsh);     
+		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x\n",RegisterFile[Fields->rd],RegisterFile[Fields->rs1],RegisterFile[Fields->rs2]);
+		print_regs();
 		return 1;
 	};
 	uint32_t MULHU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		uint64_t unsigned_rs1 = static_cast<uint64_t>(RegisterFile[Fields->rs1]);
+		uint64_t unsigned_rs2 = static_cast<uint64_t>(RegisterFile[Fields->rs2]);
+		int64_t leftshift_rs1= unsigned_rs1 << 32;
+		int64_t signedtemp_rs1 = static_cast<int64_t>(leftshift_rs1);
+		int64_t signextend_rs1 = signedtemp_rs1 >> 32;
+		int64_t signed_rs1 = static_cast <int64_t>(signextend_rs1);
+		uint64_t mult64 = signed_rs1 * unsigned_rs2; 
+		cout << "value of mult64:" << mult64 << endl;
+		uint64_t mult64rsh = (mult64 >> 32);
+		RegisterFile[Fields->rd]   =  static_cast<uint32_t>(mult64rsh);	        
+		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x\n",RegisterFile[Fields->rd],RegisterFile[Fields->rs1],RegisterFile[Fields->rs2]);
+		print_regs();
 		return 1;
 	};
 	uint32_t DIV(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
