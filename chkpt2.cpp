@@ -40,6 +40,17 @@ uint32_t RtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 									case 0b101: SRA(Fields,RegisterFile);	break;
 									default : cerr << "***ILLEGAL Funct3*** Supplied to R-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
 								} break;
+				case 0b0000001: switch(funct3temp){
+									case 0b000: MUL(Fields,RegisterFile);		break;
+									case 0b001: MULH(Fields,RegisterFile);		break;
+									case 0b010: MULHSU(Fields,RegisterFile);	break;
+									case 0b011: MULHU(Fields,RegisterFile);		break;
+									case 0b100: DIV(Fields,RegisterFile);		break;
+									case 0b101: DIVU(Fields,RegisterFile);		break;
+									case 0b110: REM(Fields,RegisterFile);		break;
+									case 0b111: REMU(Fields,RegisterFile);		break;
+									default : cerr << "***ILLEGAL Funct3*** Supplied to R-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
+								} break;
 				default : cerr << "***ILLEGAL Funct7*** Supplied to R-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
 	}
 	return 1;
