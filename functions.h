@@ -528,9 +528,20 @@
 		return 1;
 	};
 	uint32_t MUL(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		RegisterFile[Fields->rd] = (RegisterFile[Fields->rs1] * RegisterFile[Fields->rs2]); // places the lower 32 bits result in rd register
+		print_regs();
 		return 1;
 	};
 	uint32_t MULH(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		int64_t rs1;
+		int64_t rs2;
+		rs1 = static_cast<int64_t>(RegisterFile[Fields->rs1]);
+		rs2 = static_cast<int64_t>(RegisterFile[Fields->rs2]);
+		int64_t result = static_cast<int64_t>(rs1) * static_cast<int64_t>(rs2);
+                RegisterFile[Fields->rd] = static_cast<int32_t>(result >> 32);
+		print_regs();
 		return 1;
 	};
 	uint32_t MULHSU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
