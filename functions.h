@@ -75,15 +75,16 @@
 		return 1;
 	};
 	uint32_t JALR(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
-	int32_t signextendoffset;
-		uint32_t effaddress;
-		print_regs();
-		printf("Fields->imm_B12_1=0x%03x,Fields->rs1=0x%02x,Fields->rd=0x%02x\n",Fields->imm_B12_1,Fields->rs1,Fields->rd);
-		signextendoffset = int32_t(Fields->imm_B12_1);
-		effaddress = RegisterFile[Fields->rs1] + signextendoffset;
-		effaddress = effaddress << 1;                                  
-		RegisterFile[Fields->rd] = pc + 4;
-		printf("PC=0x%08x,RegisterFile[Fields->rs1]=0x%02x,RegisterFile[Fields->rd]=0x%02x\n",pc,RegisterFile[Fields->rs1],RegisterFile[Fields->rd]);
+	print_regs();
+		printf("Fields->imm_I11_0=0x%03x,PC=0x%08x,Fields->rs1=0x%02x,Fields->rd=0x%02x\n", Fields->imm_I11_0, pc, Fields->rs1, Fields->rd);
+		int32_t leftshiftimm = (Fields->imm_I11_0) << 20;
+		int32_t signed_imm = static_cast<int32_t>(leftshiftimm);
+		int32_t signextendimm = signed_imm >> 20;
+		int32_t effectiveaddress = RegisterFile[Fields->rs1] + signextendimm;
+		effectiveaddress = effectiveaddress << 1;
+		RegisterFile[Fields->rd] = pc + effectiveaddress;
+		pc = (pc + effectiveaddress) - 4;
+		printf("PC=0x%08x,RegisterFile[Fields->rs1]=0x%08x, RegisterFile[Fields->rd]=0x%08x,signextendimm=0x%08x,effectiveaddress=0x%08x\n", pc, RegisterFile[Fields->rs1],RegisterFile[Fields->rd], signextendimm, effectiveaddress);
 		print_regs();
 		return 1;
 	};
@@ -143,14 +144,27 @@
 	};
 	uint32_t BGE(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 	int32_t signextendoffset;
-                print_regs();
-                printf("Fields->imm_B12_1=0x%03x,Fields->rs1=0x%02x,Fields->rs2=0x%02x,PC=0x%08x\n",Fields->imm_B12_1,Fields->rs1,Fields->rs2,pc);
-                signextendoffset = int32_t(Fields->imm_B12_1);
-                if(RegisterFile[Fields->rs1] >= RegisterFile[Fields->rs2])
-                                pc = pc + signextendoffset;
-                else    pc = pc + 4;
-                printf("RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x,PC=0x%08x\n",RegisterFile[Fields->rs1],RegisterFile[Fields->rs2],pc);
-                print_regs();
+		print_regs();
+		printf("Fields->imm_B12_1=0x%03x,Fields->rs1=0x%02x,Fields->rs2=0x%02x,PC=0x%08x\n", Fields->imm_B12_1, Fields->rs1, Fields->rs2, pc);
+		int32_t imm_B12_0 = (Fields->imm_B12_1) << 1;
+		int32_t leftshiftimm = (imm_B12_0) << 19;
+		int32_t signed_imm = static_cast<int32_t>(leftshiftimm);
+		int32_t signextendimm = signed_imm >> 19;
+		int32_t signed_rs1 = static_cast<int32_t>(RegisterFile[Fields->rs1]);
+		int32_t signed_rs2 = static_cast<int32_t>(RegisterFile[Fields->rs2]);
+		uint32_t pc_temp = pc;
+		if (signed_rs1 >= signed_rs2){
+		//printf("RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x,PC=0x%08x,signed_rs1=0x%08x,signed_rs2=0x%08x, signextendimm = 0x%08x\n", RegisterFile[Fields->rs1], RegisterFile[Fields->rs2], pc, signed_rs1, signed_rs2, signextendimm);
+		//if (RegisterFile[Fields->rs1] >= RegisterFile[Fields->rs2]) {
+			pc = (pc + signextendimm) - 4;
+			if (pc > (pc_temp + 1020)) {
+				cerr << "***JUMP OUT OF BOUNDS*** Target PC address(Hex): 0x" << (pc + 4) << "is out of reach" << endl;
+				return 0;
+			}
+		}
+		else    pc = pc;
+		printf("RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x,PC=0x%08x,signed_rs1=0x%08x,signed_rs2=0x%08x, signextendimm = 0x%08x\n", RegisterFile[Fields->rs1], RegisterFile[Fields->rs2], pc, signed_rs1, signed_rs2, signextendimm);
+		print_regs();
 		return 1;
 	};
 	uint32_t BLTU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
@@ -202,21 +216,19 @@
 	};
 	uint32_t LH(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint16_t, uint8_t>& Memory){
 		print_regs();
-		printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->imm=0x%03x\n", Fields->rd, Fields->rs1, Fields->imm_I11_0);
-		uint32_t signedbit;
-		if (Fields->imm_I11_0 >> 11) signedbit = (Fields->imm_I11_0 | 0xFFFFF000);
-		else uint32_t signedbit = (Fields->imm_I11_0 | 0x000FFFFF);
-		uint32_t resultW = Memory [RegisterFile[Fields->rs1] + signedbit];
-		uint32_t resultHW = resultW & 0x0000FFFF;
-		uint32_t result32;
-		if (resultHW & 0x8000) {
-			result32 = resultHW | 0xFFFF0000;
-		}
-		else {
-			result32 = resultHW | 0x0000FFFF;
-		}
-		RegisterFile[Fields->rd] = result32;
-		printf("RegisterFile[Fields->rd]=0x%08x,RegisterFile[Fields->rs1]=0x%08x,signedbit=0x%08x,resultW=0x%08x,resultHW=0x%04x, result32=0x%08x\n", RegisterFile[Fields->rd], RegisterFile[Fields->rs1], signedbit, resultW, resultHW, result32);
+		printf("Fields->imm_S11_0=0x%03x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n", Fields->imm_S11_0, Fields->rs1, Fields->rs2);
+		int32_t leftshiftimm = (Fields->imm_I11_0) << 20;
+		int32_t signed_imm = static_cast<int32_t>(leftshiftimm);
+		int32_t signextendimm = signed_imm >> 20;
+		uint32_t effaddress = RegisterFile[Fields->rs1] + signextendimm;
+		print_memory();
+		uint32_t mem16bit = Memory[effaddress] | (Memory[effaddress + 1] << 8);
+		int32_t leftshift16bit = (mem16bit) << 16;
+		int32_t signed_16bit = static_cast<int32_t>(leftshift16bit);
+		int32_t signextend16bit = signed_16bit >> 16;
+		RegisterFile[Fields->rd] = signextend16bit;
+		printf("RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rd]=0x%08x,effaddress=0x%08x,Memory[effaddress]=0x%08x,mem16bit=0x%02x\n", RegisterFile[Fields->rs1], RegisterFile[Fields->rd], effaddress, Memory[effaddress], mem16bit);
+		print_memory();
 		print_regs();
 		return 1;
 	};
@@ -229,10 +241,10 @@
 		else Immediate_Signed = static_cast<int>(Fields->imm_I11_0);
 		effectiveaddress = Immediate_Signed + RegisterFile[Fields->rs1];
 		if(effectiveaddress % 4 == 0) printf("Unaligned Memory Reference! Address: %08x \n",effectiveaddress);
-		//print_memory(effectiveaddress);
+		print_memory();
 		RegisterFile[Fields->rd] = Memory[effectiveaddress] | (Memory[effectiveaddress + 1] << 8) | (Memory[effectiveaddress + 2] <<16) | (Memory[effectiveaddress + 3] << 24);
 		printf("Fields->imm_B12_1=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x, Immediate_Signed=0x%08x, Memory[%08x]=0x%08x \n",Fields->imm_B12_1,Fields->rs2,Fields->rs1, Immediate_Signed, effectiveaddress, Memory[effectiveaddress]);
-		//print_memory(effectiveaddress);
+		print_memory();
 		print_regs();
 		return 1;
 	};
@@ -272,16 +284,21 @@
 		return 1; 
 	};
 	uint32_t SB(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint16_t, uint8_t>& Memory){
-	print_regs();
-		int32_t signextendimm;
-		uint32_t effaddress;
-		printf("Fields->imm_S11_0=0x%03x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->imm_S11_0,Fields->rs1,Fields->rs2);
-		signextendimm = int32_t(Fields->imm_S11_0);
-		effaddress = RegisterFile[Fields->rs1] + signextendimm;
-		Memory[effaddress] = RegisterFile[Fields->rs2];	
-		printf("RegisterFile[Fields->rs1]=0x%08x,RegisterFile[Fields->rs2]=0x%08x,effaddress=0x%08x,Memory[effaddress]=0x%08x\n",RegisterFile[Fields->rs1], RegisterFile[Fields->rs2],effaddress,Memory[effaddress]);
-		print_regs();
-		return 1;
+		int32_t effectiveaddress;
+		 print_regs();
+		 printf("Fields->imm_S11_0=0x%03x,Fields->rs2=0x%02x,Fields->rs1=0x%02x \n", Fields->imm_S11_0, Fields->rs2, Fields->rs1);
+		 int Immediate_Signed;
+		 if (Fields->imm_S11_0 >> 11) Immediate_Signed = static_cast<int>(Fields->imm_S11_0 | 0xFFFFF000);
+		 else Immediate_Signed = static_cast<int>(Fields->imm_S11_0);
+		 effectiveaddress = RegisterFile[Fields->rs1] + Immediate_Signed;
+		// if(effectiveaddress % 2 == 0) printf("Unaligned Memory Reference! Address: %08x \n", effectiveaddress); 
+		 print_memory();
+		 Memory[effectiveaddress] = RegisterFile[Fields->rs2] & 0x00000FF;
+		 //Memory[effectiveaddress + 1] = (RegisterFile[Fields->rs2] >> 8) & 0x000000FF;
+		 print_memory();
+		 printf("Fields->imm_S11_0=0x%03x, Fields->rs2=0x%02x, Fields->rs1=0x%02x, Memory[%08x]=%08x \n", Fields->imm_S11_0, Fields->rs2, Fields->rs1, effectiveaddress, Memory[effectiveaddress]);
+		 print_regs();
+		 return 1;
 	};
 	uint32_t SH(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile,map <uint16_t, uint8_t>& Memory){
 		int32_t effectiveaddress;
@@ -292,10 +309,10 @@
 		else Immediate_Signed = static_cast<int>(Fields->imm_S11_0);
 		effectiveaddress = RegisterFile[Fields->rs1] + Immediate_Signed;
 		// if(effectiveaddress % 2 == 0) printf("Unaligned Memory Reference! Address: %08x \n", effectiveaddress); 
-		//print_memory(effectiveaddress);
+		print_memory();
 		Memory[effectiveaddress] = RegisterFile[Fields->rs2] & 0x00000FF;
 		Memory[effectiveaddress+1] = (RegisterFile[Fields->rs2] >>8) & 0x000000FF;
-		//print_memory(effectiveaddress);
+		print_memory();
 		printf("Fields->imm_S11_0=0x%03x, Fields->rs2=0x%02x, Fields->rs1=0x%02x, Memory[%08x]=%08x \n",Fields->imm_S11_0,Fields->rs2,Fields->rs1, effectiveaddress, Memory[effectiveaddress]);
 		print_regs();
 		return 1;
