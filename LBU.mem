@@ -1,0 +1,2 @@
+0: 80F3AFA3 //store a5 into effective address 21 (immediate is negative but rs1 is added
+4: 2404F83 //a5 into r31
