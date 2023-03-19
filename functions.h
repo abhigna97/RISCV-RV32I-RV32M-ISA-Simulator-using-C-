@@ -596,8 +596,33 @@
 		return 1;
 	};
 	uint32_t REM(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
-		return 1;
+		print_regs();
+		int32_t signed_rs1 = static_cast<int32_t>(RegisterFile[Fields->rs1]);
+		int32_t signed_rs2 = static_cast<int32_t>(RegisterFile[Fields->rs2]);
+		printf("Fields->rd=0x%02x, Fields->rs1=0x%02x, Fields->rs2=0x%02x\n", Fields->rd, Fields->rs1, Fields->rs2);
+		if (signed_rs2 == 0) { // division by zero
+			RegisterFile[Fields->rd] = signed_rs1; // remainder is equal to dividend
+		}
+		else { // valid division
+			RegisterFile[Fields->rd] = signed_rs1 % signed_rs2; // compute remainder
+			//if (RegisterFile[Fields->rd] < 0) { // if remainder is negative, adjust it to have the same sign as dividend
+					//RegisterFile[Fields->rd] += signed_rs2;
+			//}
+		}
+		printf("RegisterFile[Fields->rd]=0x%08x, RegisterFile[Fields->rs1]=0x%08x, RegisterFile[Fields->rs2]=0x%08x\n", RegisterFile[Fields->rd], RegisterFile[Fields->rs1], RegisterFile[Fields->rs2]);
+		print_regs();
+		return 1; 
 	};
 	uint32_t REMU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		print_regs();
+		printf("Fields->rd=0x%02x, Fields->rs1=0x%02x, Fields->rs2=0x%02x\n", Fields->rd, Fields->rs1, Fields->rs2);
+		if (RegisterFile[Fields->rs2] == 0) {  // division by zero
+			RegisterFile[Fields->rd] = RegisterFile[Fields->rs1]; // remainder is equal to dividend
+		}
+		else { // valid division
+			RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] % RegisterFile[Fields->rs2]; // compute remainder
+		}
+		printf("RegisterFile[Fields->rd]=0x%08x, RegisterFile[Fields->rs1]=0x%08x, RegisterFile[Fields->rs2]=0x%08x\n", RegisterFile[Fields->rd], RegisterFile[Fields->rs1], RegisterFile[Fields->rs2]);
+		print_regs();
 		return 1;
 	};
