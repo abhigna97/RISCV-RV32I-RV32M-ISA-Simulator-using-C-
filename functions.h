@@ -527,3 +527,27 @@
 	uint32_t EBREAK(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
 		return 1;
 	};
+	uint32_t MUL(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		return 1;
+	};
+	uint32_t MULH(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		return 1;
+	};
+	uint32_t MULHSU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		return 1;
+	};
+	uint32_t MULHU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		return 1;
+	};
+	uint32_t DIV(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		return 1;
+	};
+	uint32_t DIVU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		return 1;
+	};
+	uint32_t REM(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		return 1;
+	};
+	uint32_t REMU(struct InstrFields *Fields,map<uint32_t, uint32_t>& RegisterFile){
+		return 1;
+	};
