@@ -479,7 +479,10 @@
 			print_regs();
 			printf("Fields->imm_I11_0=0x%03x,Fields->rs1=0x%02x,Fields->rd=0x%02x",Fields->imm_I11_0,Fields->rs1,Fields->rd);
 		#endif
-		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] < Fields->imm_I11_0 ? 1 : 0;
+		int32_t leftshiftimm = (Fields->imm_I11_0) << 20;
+                int32_t signed_imm = static_cast<int32_t>(leftshiftimm);
+                int32_t signextendimm = signed_imm >> 20;
+		RegisterFile[Fields->rd] = RegisterFile[Fields->rs1] < uint32_t(signextendimm) ? 1 : 0;
 		RegisterFile[0] = 0x00000000;
 		#ifdef DEBUG
 			printf("Fields->imm_I11_0=0x%03x,Fields->rs1=0x%02x,Fields->rd=0x%02x",Fields->imm_I11_0,Fields->rs1,Fields->rd);
@@ -628,8 +631,8 @@
 			print_regs();
 			printf("Fields->rd=0x%02x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->rd,Fields->rs1,Fields->rs2);
 		#endif
-		int32_t rs1 = int32_t(RegisterFile[Fields->rs1]);
-		int32_t rs2 = int32_t(RegisterFile[Fields->rs2]);
+		int32_t rs1 = static_cast<int32_t>(RegisterFile[Fields->rs1]);
+		int32_t rs2 = static_cast<int32_t>(RegisterFile[Fields->rs2]);
 		RegisterFile[Fields->rd] = rs1 < rs2 ? 1 : 0;
 		RegisterFile[0] = 0x00000000;
 		#ifdef DEBUG
