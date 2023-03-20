@@ -1,4 +1,4 @@
-#define SILENT				
+#define STEPVERBOSE				
 // SILENT  		- 	prints PC and regs at end of all instructions
 // VERBOSE 		- 	prints PC and regs at end of each instruction
 // DEBUG 		- 	prints miscellaneous information
@@ -14,9 +14,9 @@
 #include <bitset>
 #include <unordered_map>
 #include <bits/stdc++.h>
-#include "declarations.h"		// Contains Memory, Constants and Instruction Fields Struct Declarations
-#include "functions.h"			// Contains Definition of PC/Memory/Register Read/Write functions, RV32I Functions.
-#include "preload.h"			// File to Preload the registers and memory locations for Function Specific testing
+#include "declarations.h"					// Contains Memory, Constants and Instruction Fields Struct Declarations
+#include "BaseExtendFunctions.h"			// Contains Definition of PC/Memory/Register Read/Write functions, RV32I Functions.
+#include "preload.h"						// File to Preload the registers and memory locations for Function Specific testing
 
 /***************************************** EXECUTE FUNCTIONS SPECIFIC TO INSTRUCTION TYPE *****************************************/
 
@@ -316,6 +316,8 @@ int main(int argc, char *argv[]) {
  
 	string memoryimage= "program.mem";		// Default memory image file
 	uint32_t max_pc;						// To track the Maximum value of PC supplied from mem file
+	char choice;
+	uint32_t count=0;
 
     if (argc > 4) {
         cerr << "***CHECK ARGUMENTS*** Incorrect Number of Arguments Provided. Should be Used as follows: \n" << argv[0] << " <pc> <sp> <memoryimage>" << endl;
@@ -389,9 +391,17 @@ int main(int argc, char *argv[]) {
 					cerr << "***TRAP*** Instruction at address:0x" << hex << currentPC << " is all 0's. Terminating the Simulation" << endl;
 					return 0;
 				} else {
+					count ++;
 					uint32_t opcode = currentINSTR & 0x7F;
 						#ifdef VERBOSE
 							cout << "******************************** Instruction: 0x" << hex << currentINSTR << " ***********************************\n" << endl;
+						#endif
+						#ifdef STEPVERBOSE
+							cout << "\n****Executing Instruction #" << count <<"****\n\nChoose to print : Instruction(I/i),Registers(R/r),Memory(M/m), All (A/a), Only Instruction&Registers (B/b),\n Only Instruction&Memory (C/c),Only Registers&Memory (D/d),No(Any Other Key) ****\n" ;
+							cin >> choice;
+							if(choice == 'I' || choice == 'i' || choice == 'A' || choice == 'a' || choice == 'B' || choice == 'b' || choice == 'C' || choice == 'c' ){
+								cout << "******************************** Instruction: 0x" << hex << currentINSTR << " ***********************************\n" << endl;
+							}
 						#endif
 						switch(opcode){
 							case 0b0110111: if(!UtypeDecode(&Fields,currentINSTR)) return 0;	break;	// For LUI
@@ -403,13 +413,25 @@ int main(int argc, char *argv[]) {
 							case 0b0100011: if(!StypeDecode(&Fields,currentINSTR)) return 0;	break;	// For SB,SH,SW
 							case 0b0010011: if(!ItypeDecode(&Fields,currentINSTR)) return 0;	break;	// For ADDI,SLTI,SLTIU,ANDI,ORI,XORI,SLLI,SRLI,SRAI
 							case 0b0110011: if(!RtypeDecode(&Fields,currentINSTR)) return 0;	break;	// For ADD,SLT,SLTU,AND,OR,XOR,SLL,SRL,SUB,SRA
-							case 0b0001111: break; 							 							// For FENCE
-							case 0b1110011: if(!ItypeDecode(&Fields,currentINSTR)) return 0;	break;	// For ECALL,EBREAK
+							//case 0b0001111: break; 							 						// For FENCE
+							//case 0b1110011: if(!ItypeDecode(&Fields,currentINSTR)) return 0;	break;	// For ECALL,EBREAK
 							default : 		cerr << "***ILLEGAL OPCODE*** Detected at address(hex): "<< hex << currentPC << "\tInstruction:"<< setfill('0') << setw(8) << hex << currentINSTR <<"\topcode(binary): " << bitset<7>(opcode) <<"\n"; 
 											return 0; break;
 						}
 						#ifdef VERBOSE
 							print_regs();
+						#endif
+						#ifdef STEPVERBOSE
+							if(choice == 'R' || choice == 'r'|| choice == 'B' || choice == 'b'){
+								print_regs();
+							} else if (choice == 'M' || choice == 'm'|| choice == 'C' || choice == 'c'){
+								print_memory();
+							} else if (choice == 'A' || choice == 'a' || choice == 'D' || choice == 'd'){
+								print_regs();
+								print_memory();
+							} else {
+								cout << "\n\nThanks...Proceeding to next instruction execution....\n\n" << endl;
+							};
 						#endif
 				}
 			} else {
