@@ -108,7 +108,7 @@
 			return 0;
 		} else {
 			RegisterFile[Fields->rd] = pc + 4;
-			pc = (pc + effectiveaddress) - 4;
+			pc = (effectiveaddress) - 4;
 		}
 		RegisterFile[0] = 0x00000000;
 		#ifdef DEBUG
@@ -244,12 +244,16 @@
 			print_regs();
 			printf("Fields->imm_S11_0=0x%03x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->imm_S11_0,Fields->rs1,Fields->rs2);
 		#endif
+		if((Fields->rd)==0x00) {
+			cout << "***TRAP***LB::LOAD TO REGISTER 0 IS NOT PERMITTED***"  << endl;
+			return 0;
+		}
 		int32_t leftshiftimm	= (Fields->imm_I11_0) << 20;
 		int32_t signed_imm 		= static_cast<int32_t>(leftshiftimm);
 		int32_t signextendimm 	= signed_imm >> 20;
         uint32_t effaddress 	= RegisterFile[Fields->rs1] + signextendimm;
 		uint32_t mem8bit;
-		if(effaddress < MEM_SIZE){
+		if(effaddress < MEM_SIZE){    // MEM_SIZE
 			mem8bit 				= Memory[effaddress];
 			int32_t leftshiftbyte	= (mem8bit) << 24;
 			int32_t signed_byte 	= static_cast<int32_t>(leftshiftbyte);
@@ -272,12 +276,16 @@
 			print_regs();
 			printf("Fields->imm_S11_0=0x%03x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n", Fields->imm_S11_0, Fields->rs1, Fields->rs2);
 		#endif
+		if((Fields->rd)==0x00) {
+			cout << "***TRAP***LH::LOAD TO REGISTER 0 IS NOT PERMITTED***"  << endl;
+			return 0;
+		}
 		int32_t leftshiftimm 	= (Fields->imm_I11_0) << 20;
 		int32_t signed_imm 		= static_cast<int32_t>(leftshiftimm);
 		int32_t signextendimm 	= signed_imm >> 20;
 		uint32_t effaddress 	= RegisterFile[Fields->rs1] + signextendimm;
 		uint32_t mem16bit;
-		if(effaddress < MEM_SIZE){
+		if(effaddress < MEM_SIZE-2){         // MEM_SIZE - 2
 			mem16bit 				= Memory[effaddress] | (Memory[effaddress + 1] << 8);
 			int32_t leftshift16bit 	= (mem16bit) << 16;
 			int32_t signed_16bit 	= static_cast<int32_t>(leftshift16bit);
@@ -301,11 +309,15 @@
 			print_regs();
 			printf("Fields->imm_B12_1=0x%03x, Fields->rs1=0x%02x, Fields->rd=0x%02x \n",Fields->imm_B12_1, Fields->rs1, Fields->rd);
 		#endif
+		if((Fields->rd)==0x00) {
+			cout << "***TRAP***LW::LOAD TO REGISTER 0 IS NOT PERMITTED***"  << endl;
+			return 0;
+		}
 		int Immediate_Signed;
 		if(Fields->imm_I11_0 >>11) Immediate_Signed = static_cast<int>(Fields->imm_I11_0 | 0xFFFFF000);
 		else Immediate_Signed = static_cast<int>(Fields->imm_I11_0);
-		int32_t effectiveaddress = Immediate_Signed + RegisterFile[Fields->rs1];
-		if(effectiveaddress < MEM_SIZE){
+		int32_t effectiveaddress = Immediate_Signed + RegisterFile[Fields->rs1];		
+		if(effectiveaddress < MEM_SIZE-4){ // MEM_SIZE - 4
 			RegisterFile[Fields->rd] = Memory[effectiveaddress] | (Memory[effectiveaddress + 1] << 8) | (Memory[effectiveaddress + 2] <<16) | (Memory[effectiveaddress + 3] << 24);
 		} else {
 			cout << "***LW::MEMORY ADDRESS OUT OF BOUNDS*** Address Accessed is 0x" << hex << effectiveaddress << endl;
@@ -325,11 +337,15 @@
 			print_regs();
 			printf("Fields->imm_I11_0=0x%03x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->imm_I11_0,Fields->rs1,Fields->rs2);
 		#endif
+		if((Fields->rd)==0x00) {
+			cout << "***TRAP***LBU::LOAD TO REGISTER 0 IS NOT PERMITTED***"  << endl;
+			return 0;
+		}
 		uint32_t signextendimm 	= Fields->imm_I11_0 >> 11 == 1? (Fields->imm_I11_0) |0xFFFFF000 : Fields->imm_I11_0;
 		int32_t signedanswer 	= static_cast<int>(signextendimm);
 		int32_t signedrs1 		= static_cast<int>(RegisterFile[Fields->rs1]);
 		uint32_t effaddress 	= signedrs1 + signedanswer;
-		if(effaddress < MEM_SIZE){
+		if(effaddress < MEM_SIZE){   // MEM_SIZE
 			RegisterFile[Fields->rd] = Memory[effaddress];
 		} else {
 			cout << "***LBU::MEMORY ADDRESS OUT OF BOUNDS*** Address Accessed is 0x" << hex << effaddress << endl;
@@ -348,12 +364,16 @@
 			print_regs();
 			printf("Fields->imm_S11_0=0x%03x,Fields->rs1=0x%02x,Fields->rs2=0x%02x\n",Fields->imm_S11_0,Fields->rs1,Fields->rs2);
 		#endif
+		if((Fields->rd)==0x00) {
+			cout << "***TRAP***LHU::LOAD TO REGISTER 0 IS NOT PERMITTED***"  << endl;
+			return 0;
+		}
 		int32_t leftshiftimm	= (Fields->imm_I11_0) << 20;
 		int32_t signed_imm 		= static_cast<int32_t>(leftshiftimm);
 		int32_t signextendimm 	= signed_imm >> 20;
         uint32_t effaddress 	= RegisterFile[Fields->rs1] + signextendimm;
 		uint16_t mem16bit;
-		if(effaddress < MEM_SIZE){
+		if(effaddress < MEM_SIZE-2){       // MEM_SIZE - 2
 			mem16bit = Memory[effaddress] | (Memory[effaddress + 1] << 8);
 			RegisterFile[Fields->rd] = static_cast<uint32_t>(mem16bit);
 		} else {
@@ -376,7 +396,7 @@
 		if (Fields->imm_S11_0 >> 11) Immediate_Signed = static_cast<int>(Fields->imm_S11_0 | 0xFFFFF000);
 		else Immediate_Signed = static_cast<int>(Fields->imm_S11_0);
 		int32_t effectiveaddress = RegisterFile[Fields->rs1] + Immediate_Signed;
-		if(effectiveaddress < MEM_SIZE){
+		if(effectiveaddress < MEM_SIZE){ // MEM_SIZE
 			Memory[effectiveaddress] = RegisterFile[Fields->rs2] & 0x00000FF;
 		} else {
 			cout << "***SB::MEMORY ADDRESS OUT OF BOUNDS*** Address Accessed is 0x" << hex << effectiveaddress << endl;
@@ -400,7 +420,7 @@
 		if(Fields->imm_S11_0 >> 11) Immediate_Signed = static_cast<int>(Fields->imm_S11_0 | 0xFFFFF000);
 		else Immediate_Signed = static_cast<int>(Fields->imm_S11_0);
 		int32_t effectiveaddress 	= RegisterFile[Fields->rs1] + Immediate_Signed;
-		if(effectiveaddress < MEM_SIZE){
+		if(effectiveaddress < MEM_SIZE-2){  // MEM_SIZE - 2
 			Memory[effectiveaddress] 	= RegisterFile[Fields->rs2] & 0x00000FF;
 			Memory[effectiveaddress+1]	= (RegisterFile[Fields->rs2] >>8) & 0x000000FF;
 		} else {
@@ -425,7 +445,7 @@
 		int32_t signedanswer 	= static_cast<int32_t>(signextendimm);
 		int32_t signedrs1 		= static_cast<int32_t>(RegisterFile[Fields->rs1]);
         uint32_t effaddress 	= signedrs1 + signedanswer;
-		if(effaddress < MEM_SIZE){
+		if(effaddress < MEM_SIZE-4){    // MEM_SIZE - 4
 			Memory[effaddress] 		= RegisterFile[Fields->rs2]       & 0x000000FF;
 			Memory[effaddress+1] 	= RegisterFile[Fields->rs2] >> 8  & 0x000000FF;
 			Memory[effaddress+2] 	= RegisterFile[Fields->rs2] >> 16 & 0x000000FF;

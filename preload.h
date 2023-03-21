@@ -229,4 +229,10 @@ void PREload(){
 	//LBPreload();
 	//BLTPreload();
 	//JALPreload();
+	// set_reg(0x04,0xFFFF0000);//rs2
+	// set_reg(0x08,0xFFFE0000);//rs1
+	// set_reg(0x05,0x00321018);//rd
+	// set_reg(0x18,0x00000004);//rs2
+	// set_reg(0x06,0x00000002);//rs1
+	// set_reg(0xF1,0x00321018);//rd
 }

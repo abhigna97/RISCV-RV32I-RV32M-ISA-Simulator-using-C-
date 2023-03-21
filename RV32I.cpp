@@ -1,9 +1,9 @@
-#define STEPVERBOSE				
+#define DEBUG
 // SILENT  		- 	prints PC and regs at end of all instructions
 // VERBOSE 		- 	prints PC and regs at end of each instruction
 // DEBUG 		- 	prints miscellaneous information
 // DEBUGMEM 	- 	Prints Memory Contents
-// STEPVERBOSE 	- 	Prints PC and regs at end of each instruction and needs user to press "ENTER" to proceed to next instruction
+// STEPVERBOSE 	- 	Prints PC and regs at end of each instruction and needs user to press a key followed by "ENTER" to proceed to next instruction
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -15,7 +15,7 @@
 #include <unordered_map>
 #include <bits/stdc++.h>
 #include "declarations.h"					// Contains Memory, Constants and Instruction Fields Struct Declarations
-#include "BaseExtendFunctions.h"			// Contains Definition of PC/Memory/Register Read/Write functions, RV32I Functions.
+#include "BaseExtendFunctions.h"			// Contains Definition of PC/Memory/Register Read/Write functions, RV32I,RV32M Functions.
 #include "preload.h"						// File to Preload the registers and memory locations for Function Specific testing
 
 /***************************************** EXECUTE FUNCTIONS SPECIFIC TO INSTRUCTION TYPE *****************************************/
@@ -26,14 +26,14 @@ uint32_t RtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	funct7temp = Fields->funct7;
     switch(funct7temp){
 				case 0b0000000: switch (funct3temp){
-									case 0b000: if(!ADD(Fields,RegisterFile)) return 0;		break;
-									case 0b001: if(!SLL(Fields,RegisterFile)) return 0;		break;
-									case 0b010: if(!SLT(Fields,RegisterFile)) return 0;		break;
-									case 0b011: if(!SLTU(Fields,RegisterFile)) return 0;	break;
-									case 0b100: if(!XOR(Fields,RegisterFile)) return 0;		break;
-									case 0b101: if(!SRL(Fields,RegisterFile)) return 0;		break;
-									case 0b110: if(!OR(Fields,RegisterFile)) return 0;		break;
-									case 0b111: if(!AND(Fields,RegisterFile)) return 0;		break;
+									case 0b000: if(!ADD(Fields,RegisterFile)) 	return 0;		break;
+									case 0b001: if(!SLL(Fields,RegisterFile)) 	return 0;		break;
+									case 0b010: if(!SLT(Fields,RegisterFile)) 	return 0;		break;
+									case 0b011: if(!SLTU(Fields,RegisterFile)) 	return 0;		break;
+									case 0b100: if(!XOR(Fields,RegisterFile)) 	return 0;		break;
+									case 0b101: if(!SRL(Fields,RegisterFile)) 	return 0;		break;
+									case 0b110: if(!OR(Fields,RegisterFile)) 	return 0;		break;
+									case 0b111: if(!AND(Fields,RegisterFile)) 	return 0;		break;
 									default: cerr << "***ILLEGAL Funct3*** Supplied to R-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
 								} break;
 				case 0b0100000: switch (funct3temp){
@@ -42,14 +42,14 @@ uint32_t RtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 									default : cerr << "***ILLEGAL Funct3*** Supplied to R-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
 								} break;
 				case 0b0000001: switch(funct3temp){
-									case 0b000: if(!MUL(Fields,RegisterFile)) return 0;			break;
-									case 0b001: if(!MULH(Fields,RegisterFile)) return 0;		break;
-									case 0b010: if(!MULHSU(Fields,RegisterFile)) return 0;		break;
-									case 0b011:	if(!MULHU(Fields,RegisterFile)) return 0;		break;
-									case 0b100: if(!DIV(Fields,RegisterFile)) return 0;			break;
-									case 0b101: if(!DIVU(Fields,RegisterFile)) return 0;		break;
-									case 0b110: if(!REM(Fields,RegisterFile)) return 0;			break;
-									case 0b111: if(!REMU(Fields,RegisterFile)) return 0;		break;
+									case 0b000: if(!MUL(Fields,RegisterFile)) 		return 0;		break;
+									case 0b001: if(!MULH(Fields,RegisterFile)) 		return 0;		break;
+									case 0b010: if(!MULHSU(Fields,RegisterFile)) 	return 0;		break;
+									case 0b011:	if(!MULHU(Fields,RegisterFile)) 	return 0;		break;
+									case 0b100: if(!DIV(Fields,RegisterFile)) 		return 0;		break;
+									case 0b101: if(!DIVU(Fields,RegisterFile)) 		return 0;		break;
+									case 0b110: if(!REM(Fields,RegisterFile)) 		return 0;		break;
+									case 0b111: if(!REMU(Fields,RegisterFile)) 		return 0;		break;
 									default : cerr << "***ILLEGAL Funct3*** Supplied to R-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
 								} break;
 				default : cerr << "***ILLEGAL Funct7*** Supplied to R-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
@@ -64,26 +64,26 @@ uint32_t ItypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	imm11_5temp=Fields->imm_I11_5;
 	switch(opcodetemp){
     case 0b0000011:	switch(funct3temp){
-						case 0b000: if(!LB(Fields,RegisterFile,Memory)) return 0;		break;
-						case 0b001: if(!LH(Fields,RegisterFile,Memory)) return 0;		break;
-						case 0b010: if(!LW(Fields,RegisterFile,Memory)) return 0;		break;
-						case 0b100: if(!LBU(Fields,RegisterFile,Memory)) return 0;		break;
-						case 0b101: if(!LHU(Fields,RegisterFile,Memory)) return 0;		break;
+						case 0b000: if(!LB(Fields,RegisterFile,Memory)) 	return 0;		break;
+						case 0b001: if(!LH(Fields,RegisterFile,Memory)) 	return 0;		break;
+						case 0b010: if(!LW(Fields,RegisterFile,Memory)) 	return 0;		break;
+						case 0b100: if(!LBU(Fields,RegisterFile,Memory)) 	return 0;		break;
+						case 0b101: if(!LHU(Fields,RegisterFile,Memory)) 	return 0;		break;
 						default : cerr << "***ILLEGAL Funct3*** Supplied to I-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
 					} break;
 	case 0b0010011:	switch(funct3temp){
-						case 0b000: if(!ADDI(Fields,RegisterFile)) return 0;		break;
-						case 0b001: if(!SLLI(Fields,RegisterFile)) return 0;		break;
-						case 0b010: if(!SLTI(Fields,RegisterFile)) return 0;		break;
+						case 0b000: if(!ADDI(Fields,RegisterFile)) 	return 0;		break;
+						case 0b001: if(!SLLI(Fields,RegisterFile)) 	return 0;		break;
+						case 0b010: if(!SLTI(Fields,RegisterFile)) 	return 0;		break;
 						case 0b011: if(!SLTIU(Fields,RegisterFile)) return 0;		break;
-						case 0b100: if(!XORI(Fields,RegisterFile)) return 0;		break;
+						case 0b100: if(!XORI(Fields,RegisterFile)) 	return 0;		break;
 						case 0b101: switch(imm11_5temp){
 										case 0b0000000:	if(!SRLI(Fields,RegisterFile)) return 0;		break;
 										case 0b0100000: if(!SRAI(Fields,RegisterFile)) return 0;		break;
 										default: cerr << "***ILLEGAL Imm[11:5]*** Supplied to I-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
 									} break;
-						case 0b110: if(!ORI(Fields,RegisterFile)) return 0;			break;
-						case 0b111: if(!ANDI(Fields,RegisterFile)) return 0;		break;
+						case 0b110: if(!ORI(Fields,RegisterFile)) 	return 0;		break;
+						case 0b111: if(!ANDI(Fields,RegisterFile)) 	return 0;		break;
 						default : cerr << "***ILLEGAL Funct3*** Supplied to I-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
 					} break;
 	case 0b1100111: if(!JALR(Fields,RegisterFile)) return 0;		break;
@@ -108,12 +108,12 @@ uint32_t BtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t funct3temp;
 	funct3temp = Fields->funct3;
 	switch(funct3temp){
-				case 0b000: if(!BEQ(Fields,RegisterFile)) return 0;			break;
-				case 0b001: if(!BNE(Fields,RegisterFile)) return 0;			break;
-				case 0b100: if(!BLT(Fields,RegisterFile)) return 0;			break;
-				case 0b101: if(!BGE(Fields,RegisterFile)) return 0;			break;
-				case 0b110: if(!BLTU(Fields,RegisterFile)) return 0;		break;
-				case 0b111: if(!BGEU(Fields,RegisterFile)) return 0;		break;
+				case 0b000: if(!BEQ(Fields,RegisterFile)) 	return 0;		break;
+				case 0b001: if(!BNE(Fields,RegisterFile)) 	return 0;		break;
+				case 0b100: if(!BLT(Fields,RegisterFile)) 	return 0;		break;
+				case 0b101: if(!BGE(Fields,RegisterFile)) 	return 0;		break;
+				case 0b110: if(!BLTU(Fields,RegisterFile)) 	return 0;		break;
+				case 0b111: if(!BGEU(Fields,RegisterFile)) 	return 0;		break;
 				default : cerr << "***ILLEGAL Funct3*** Supplied to B-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
 	}
 	return 1;
@@ -123,7 +123,7 @@ uint32_t UtypeExecute(struct InstrFields *Fields, uint32_t instruction){
 	uint32_t opcodetemp;
 	opcodetemp = Fields->opcode;
     switch(opcodetemp){
-				case 0b0110111: if(!LUI(Fields,RegisterFile)) return 0;			break;
+				case 0b0110111: if(!LUI(Fields,RegisterFile)) 	return 0;		break;
 				case 0b0010111: if(!AUIPC(Fields,RegisterFile)) return 0;		break;
 				default : cerr << "***ILLEGAL Funct3*** Supplied to U-TYPE by Instruction(hex): " << hex << instruction << endl; return 0; break;
 	}
@@ -325,7 +325,7 @@ int main(int argc, char *argv[]) {
     } else {																// Parse PC and SP as 32-bit hexadecimal values, and Memory Image File as a String
 		if(argc>1){								
 			stringstream ss_pc(argv[1]);
-			ss_pc >> hex >> pc;
+			ss_pc >> hex >> pc;	
 		}
 		if(argc>2){
 			stringstream ss_sp(argv[2]);
@@ -420,6 +420,7 @@ int main(int argc, char *argv[]) {
 						}
 						#ifdef VERBOSE
 							print_regs();
+							cout << "*********************************** YOU DESERVE EXTRA CREDIT ***********************************\n" << endl;
 						#endif
 						#ifdef STEPVERBOSE
 							if(choice == 'R' || choice == 'r'|| choice == 'B' || choice == 'b'){
